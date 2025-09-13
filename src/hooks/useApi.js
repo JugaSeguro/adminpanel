@@ -142,7 +142,22 @@ const mockApiResponse = async (endpoint, options = {}) => {
       
       // Actualizar los textos en la configuración mock
       if (textsData) {
-        Object.assign(MOCK_CONFIG.texts, textsData)
+        // Actualizar textos principales
+        if (textsData.mainTitle) MOCK_CONFIG.texts.mainTitle = textsData.mainTitle;
+        if (textsData.subtitle) MOCK_CONFIG.texts.subtitle = textsData.subtitle;
+        if (textsData.description) MOCK_CONFIG.texts.description = textsData.description;
+        if (textsData.telegram) MOCK_CONFIG.texts.telegram = textsData.telegram;
+        
+        // Actualizar botones
+        if (textsData.buttons) {
+          MOCK_CONFIG.texts.buttons = MOCK_CONFIG.texts.buttons || {};
+          if (textsData.buttons.bonus) MOCK_CONFIG.texts.buttons.bonus = textsData.buttons.bonus;
+          if (textsData.buttons.register) MOCK_CONFIG.texts.buttons.register = textsData.buttons.register;
+          if (textsData.buttons.access) MOCK_CONFIG.texts.buttons.access = textsData.buttons.access;
+          if (textsData.buttons.chat) MOCK_CONFIG.texts.buttons.chat = textsData.buttons.chat;
+        }
+        
+        console.log('Textos actualizados:', MOCK_CONFIG.texts);
       }
       
       return {
