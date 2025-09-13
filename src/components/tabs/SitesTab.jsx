@@ -166,7 +166,7 @@ const SitesTab = () => {
               </div>
             </div>
           )
-        }))
+        })
         )}
       </div>
 

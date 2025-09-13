@@ -9,7 +9,7 @@ const Navigation = () => {
       id: 'config',
       label: 'URLs y Enlaces',
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.102m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
         </svg>
       ),
@@ -22,7 +22,7 @@ const Navigation = () => {
       id: 'texts',
       label: 'Textos y Botones',
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
         </svg>
       ),
@@ -35,7 +35,7 @@ const Navigation = () => {
       id: 'sites',
       label: 'Estado de Sitios',
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
         </svg>
       ),
@@ -48,7 +48,7 @@ const Navigation = () => {
       id: 'deploy',
       label: 'Despliegue',
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
         </svg>
       ),
@@ -61,9 +61,9 @@ const Navigation = () => {
 
   return (
     <nav className="relative bg-white/50 backdrop-blur-sm border-b border-white/20 shadow-lg animate-fade-in">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-800">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 py-1.5 sm:py-2">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <h2 className="text-base sm:text-lg font-bold text-slate-800">
             <span className="hidden sm:inline">Panel de Control</span>
             <span className="sm:hidden">Panel</span>
           </h2>
@@ -77,7 +77,7 @@ const Navigation = () => {
             {tabs.map(({ id, label, icon, description, color, bgColor, borderColor }, index) => (
               <button
                 key={id}
-                className={`group relative flex items-center space-x-2 sm:space-x-3 px-3 sm:px-6 py-3 sm:py-4 rounded-xl font-medium transition-all duration-300 whitespace-nowrap hover-scale hover-lift ${
+                className={`group relative flex items-center space-x-1 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-md font-medium transition-all duration-300 whitespace-nowrap hover-scale hover-lift text-xs ${
                   activeTab === id
                     ? `bg-gradient-to-r ${color} text-white shadow-lg scale-105 transform animate-pulse`
                     : `${bgColor} ${borderColor} border text-slate-600 hover:text-slate-800 hover:scale-105 hover:shadow-md`
