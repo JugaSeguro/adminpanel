@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { RefreshCw, Save, Globe, Info } from 'lucide-react'
+import { RefreshCw, Save, Globe, Info, Link, MessageCircle, Send, Sparkles } from 'lucide-react'
 import { useConfig, useUpdateConfig } from '../../hooks/useApi'
 import useAppStore from '../../store/useStore'
 import toast from 'react-hot-toast'
@@ -13,6 +13,8 @@ const ConfigTab = () => {
     whatsappUrl: '',
     telegramUrl: ''
   })
+  
+  const [isFormValid, setIsFormValid] = useState(false)
 
   // Cargar datos del formulario cuando se obtiene la config
   useEffect(() => {
@@ -31,11 +33,35 @@ const ConfigTab = () => {
     }
   }, [config, getFallbackConfig])
 
+  // Validar formulario
+  useEffect(() => {
+    const isValid = formData.whatsappUrl.trim() !== '' && formData.telegramUrl.trim() !== ''
+    setIsFormValid(isValid)
+  }, [formData])
+
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }))
+  }
+
+  const validateUrl = (url, type) => {
+    if (!url) return { isValid: false, message: 'URL requerida' }
+    
+    if (type === 'whatsapp') {
+      if (!url.includes('wa.me') && !url.includes('whatsapp.com')) {
+        return { isValid: false, message: 'Debe ser una URL de WhatsApp válida' }
+      }
+    }
+    
+    if (type === 'telegram') {
+      if (!url.includes('t.me') && !url.includes('telegram.me')) {
+        return { isValid: false, message: 'Debe ser una URL de Telegram válida' }
+      }
+    }
+    
+    return { isValid: true, message: '' }
   }
 
   const handleSaveConfig = async () => {
@@ -122,111 +148,267 @@ const ConfigTab = () => {
   ]
 
   return (
-    <div className="fade-in">
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="h4 mb-0">Configuración de URLs</h2>
-        <button
-          onClick={() => refetch()}
-          disabled={isLoading}
-          className="btn btn-outline-primary"
-        >
-          <RefreshCw size={16} className={`me-2 ${isLoading ? 'spinner-border spinner-border-sm' : ''}`} />
-          Recargar Config
-        </button>
+    <div className="space-y-8 animate-fade-in">
+      {/* Header con gradiente */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border border-white/20 shadow-xl">
+        <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
+        <div className="relative z-10 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+              <Globe className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Configuración de URLs
+              </h2>
+              <p className="text-slate-600 mt-1">Gestiona los enlaces globales de todos los sitios</p>
+            </div>
+          </div>
+          <button
+            onClick={() => refetch()}
+            disabled={isLoading}
+            className="group relative px-6 py-3 bg-white/80 backdrop-blur-sm border border-white/30 rounded-xl font-medium text-slate-700 hover:bg-white/90 hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 inline ${isLoading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+            Recargar Config
+          </button>
+        </div>
+        
+        {/* Elementos decorativos */}
+        <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl"></div>
+        <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-indigo-400/20 to-pink-400/20 rounded-full blur-xl"></div>
       </div>
 
-      {/* Enlaces Globales */}
-      <div className="card mb-4">
-        <div className="card-header d-flex align-items-center">
-          <Globe size={18} className="me-2 text-primary" />
-          <h5 className="card-title mb-0">Enlaces Globales (Aplicados a Todos los Sitios)</h5>
-        </div>
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-6 mb-3">
-              <label htmlFor="whatsapp" className="form-label">WhatsApp (Único para todos):</label>
-              <input
-                id="whatsapp"
-                type="url"
-                value={formData.whatsappUrl}
-                onChange={(e) => handleInputChange('whatsappUrl', e.target.value)}
-                placeholder="https://wa.link/oy1xno"
-                className="form-control"
-              />
-              <div className="form-text">Este enlace se aplicará automáticamente a los 4 sitios</div>
+      {/* Enlaces Globales con diseño moderno */}
+      <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
+        
+        <div className="relative z-10 p-8">
+          <div className="flex items-center space-x-3 mb-8">
+            <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg">
+              <Link className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800">Enlaces Globales</h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
+            <span className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">Aplicados a todos los sitios</span>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* WhatsApp Input */}
+            <div className="group">
+              <label className="flex items-center space-x-2 text-sm font-semibold text-slate-700 mb-3">
+                <MessageCircle className="w-4 h-4 text-green-600" />
+                <span>WhatsApp Global</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="url"
+                  value={formData.whatsappUrl}
+                  onChange={(e) => handleInputChange('whatsappUrl', e.target.value)}
+                  placeholder="https://wa.link/oy1xno"
+                  className={`w-full px-4 py-4 bg-white/80 border-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 group-hover:bg-white/90 ${
+                    validateUrl(formData.whatsappUrl, 'whatsapp').isValid ? 'border-green-200' : 'border-red-200'
+                  }`}
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  {validateUrl(formData.whatsappUrl, 'whatsapp').isValid ? (
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  ) : (
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 mt-2 flex items-center space-x-1">
+                <Sparkles className="w-3 h-3" />
+                <span>Se aplicará automáticamente a los 4 sitios</span>
+              </p>
+              {!validateUrl(formData.whatsappUrl, 'whatsapp').isValid && formData.whatsappUrl && (
+                <p className="text-xs text-red-500 mt-1">{validateUrl(formData.whatsappUrl, 'whatsapp').message}</p>
+              )}
             </div>
             
-            <div className="col-md-6 mb-3">
-              <label htmlFor="telegram" className="form-label">Telegram (Único para todos):</label>
-              <input
-                id="telegram"
-                type="url"
-                value={formData.telegramUrl}
-                onChange={(e) => handleInputChange('telegramUrl', e.target.value)}
-                placeholder="https://t.me/jugadirecto"
-                className="form-control"
-              />
-              <div className="form-text">Este enlace se aplicará automáticamente a los 4 sitios</div>
+            {/* Telegram Input */}
+            <div className="group">
+              <label className="flex items-center space-x-2 text-sm font-semibold text-slate-700 mb-3">
+                <Send className="w-4 h-4 text-blue-600" />
+                <span>Telegram Global</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="url"
+                  value={formData.telegramUrl}
+                  onChange={(e) => handleInputChange('telegramUrl', e.target.value)}
+                  placeholder="https://t.me/jugadirecto"
+                  className={`w-full px-4 py-4 bg-white/80 border-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 group-hover:bg-white/90 ${
+                    validateUrl(formData.telegramUrl, 'telegram').isValid ? 'border-blue-200' : 'border-red-200'
+                  }`}
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  {validateUrl(formData.telegramUrl, 'telegram').isValid ? (
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  ) : (
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 mt-2 flex items-center space-x-1">
+                <Sparkles className="w-3 h-3" />
+                <span>Se aplicará automáticamente a los 4 sitios</span>
+              </p>
+              {!validateUrl(formData.telegramUrl, 'telegram').isValid && formData.telegramUrl && (
+                <p className="text-xs text-red-500 mt-1">{validateUrl(formData.telegramUrl, 'telegram').message}</p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Información de Sitios */}
-      <div className="card mb-4">
-        <div className="card-header d-flex align-items-center">
-          <Info size={18} className="me-2 text-primary" />
-          <h5 className="card-title mb-0">Configuración Automática de Sitios</h5>
-        </div>
-        <div className="card-body">
-          <p className="mb-4">Los 4 sitios se configuran automáticamente. Solo necesitas cambiar WhatsApp y Telegram:</p>
+      {/* Información de Sitios con diseño moderno */}
+      <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
+        
+        <div className="relative z-10 p-8">
+          <div className="flex items-center space-x-3 mb-8">
+            <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg">
+              <Info className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800">Configuración Automática</h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
+            <span className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">4 sitios configurados</span>
+          </div>
           
-          <div className="row g-3">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 rounded-xl p-6 mb-8">
+            <div className="flex items-start space-x-4">
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-900 mb-2">Configuración Inteligente</h4>
+                <p className="text-blue-800 mb-3">Los 4 sitios se configuran automáticamente. Solo necesitas cambiar WhatsApp y Telegram arriba.</p>
+                <ul className="text-blue-700 space-y-1 text-sm">
+                  <li className="flex items-center space-x-2">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Sitios 🎰 Casino (7 y 9): Página completa con botones</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Sitios 💬 WhatsApp (8 y 10): Redirección directa</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Actualización automática en todos los sitios</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {sitesMappingData.map((site, index) => (
-              <div className="col-md-6" key={index}>
-                <div className={`card h-100 ${site.type === 'casino' ? 'border-primary' : 'border-success'} border-opacity-25`}>
-                  <div className="card-body">
-                    <h5 className="card-title">{site.name}</h5>
-                    <div className="d-flex align-items-center mb-2">
-                      <span className="badge bg-secondary me-2">URL:</span>
-                      <code>{site.url}</code>
+              <div key={index} className="group">
+                <div className={`relative bg-white/80 backdrop-blur-sm border-2 rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                  site.type === 'casino' 
+                    ? 'border-blue-200 hover:border-blue-300 hover:bg-blue-50/50' 
+                    : 'border-green-200 hover:border-green-300 hover:bg-green-50/50'
+                }`}>
+                  <div className="flex items-start space-x-4">
+                    <div className={`p-3 rounded-xl shadow-lg ${
+                      site.type === 'casino' 
+                        ? 'bg-gradient-to-br from-blue-500 to-blue-600' 
+                        : 'bg-gradient-to-br from-green-500 to-green-600'
+                    }`}>
+                      <span className="text-xl">{site.name.includes('🎰') ? '🎰' : '💬'}</span>
                     </div>
-                    <p className="card-text small">{site.description}</p>
+                    <div className="flex-1">
+                      <h5 className="font-bold text-slate-800 mb-2">{site.name}</h5>
+                      <div className="flex items-center space-x-2 mb-3">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                          site.type === 'casino' 
+                            ? 'bg-blue-100 text-blue-700' 
+                            : 'bg-green-100 text-green-700'
+                        }`}>
+                          URL
+                        </span>
+                        <code className="text-sm bg-slate-100 px-2 py-1 rounded font-mono">{site.url}</code>
+                      </div>
+                      <p className="text-sm text-slate-600 leading-relaxed">{site.description}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Indicador de estado */}
+                  <div className="absolute top-3 right-3">
+                    <div className={`w-3 h-3 rounded-full animate-pulse ${
+                      site.type === 'casino' ? 'bg-blue-400' : 'bg-green-400'
+                    }`}></div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          
-          <div className="alert alert-info mt-4">
-            <div className="d-flex">
-              <div className="flex-shrink-0">
-                <Info size={24} />
-              </div>
-              <div className="ms-3">
-                <h6 className="alert-heading">Configuración Simple:</h6>
-                <ul className="mb-0 ps-3">
-                  <li>Sitios 🎰 Casino (7 y 9): Muestran página completa con botones</li>
-                  <li>Sitios 💬 WhatsApp (8 y 10): Redirigen directamente al WhatsApp</li>
-                  <li>Solo cambias WhatsApp y Telegram arriba para actualizar todos automáticamente</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Botón de guardar */}
-      <div className="d-flex justify-content-end">
-        <button
-          onClick={handleSaveConfig}
-          disabled={updateConfig.isLoading}
-          className="btn btn-primary"
-        >
-          <Save size={16} className="me-2" />
-          {updateConfig.isLoading ? 'Guardando...' : 'Guardar Configuración'}
-        </button>
+      {/* Botones de Acción con diseño moderno */}
+      <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
+        
+        <div className="relative z-10 p-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg shadow-lg">
+                <Save className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-800">Guardar Configuración</h4>
+                <p className="text-sm text-slate-600">Los cambios se aplicarán a todos los sitios</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {/* Indicador de validación */}
+              <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                isFormValid 
+                  ? 'bg-green-100 text-green-700 border border-green-200' 
+                  : 'bg-red-100 text-red-700 border border-red-200'
+              }`}>
+                <div className={`w-2 h-2 rounded-full animate-pulse ${
+                  isFormValid ? 'bg-green-500' : 'bg-red-500'
+                }`}></div>
+                <span className="text-sm font-medium">
+                  {isFormValid ? 'Formulario válido' : 'Campos requeridos'}
+                </span>
+              </div>
+              
+              {/* Botón de guardar */}
+              <button
+                onClick={handleSaveConfig}
+                disabled={updateConfig.isLoading || !isFormValid}
+                className={`group relative px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg ${
+                  updateConfig.isLoading || !isFormValid
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 hover:scale-105 hover:shadow-xl'
+                }`}
+              >
+                {updateConfig.isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Guardando...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Save className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                    <span>Guardar Configuración</span>
+                  </div>
+                )}
+                
+                {/* Efecto de brillo */}
+                {!updateConfig.isLoading && isFormValid && (
+                  <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -90,7 +90,7 @@ const SitesTab = () => {
         <button
           onClick={() => refetch()}
           disabled={isLoading}
-          className="btn btn-secondary"
+          className="btn-secondary-modern"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           Verificar Estado
@@ -146,7 +146,7 @@ const SitesTab = () => {
                   href={site.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-secondary w-full justify-center"
+                  className="btn-secondary-modern w-full justify-center"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Ver Sitio

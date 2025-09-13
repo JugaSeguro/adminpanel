@@ -5,12 +5,12 @@ const LoadingOverlay = () => {
   const { loadingMessage } = useAppStore()
 
   return (
-    <div className="loading-overlay">
-      <div className="loading-card">
-        <div className="spinner-border text-primary mb-3" role="status">
-          <span className="visually-hidden">Cargando...</span>
+    <div className="overlay-modern">
+      <div className="modal-modern text-center">
+        <div className="spinner-modern mx-auto mb-4">
+          <span className="sr-only">Cargando...</span>
         </div>
-        <p className="mb-0 fw-medium">{loadingMessage || 'Procesando...'}</p>
+        <p className="text-gray-700 font-medium">{loadingMessage || 'Procesando...'}</p>
       </div>
     </div>
   )

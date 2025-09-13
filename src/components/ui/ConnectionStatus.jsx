@@ -10,7 +10,7 @@ const ConnectionStatus = () => {
       return {
         icon: Loader,
         text: 'Conectando...',
-        className: 'connecting'
+        className: 'status-connecting'
       }
     }
     
@@ -18,22 +18,22 @@ const ConnectionStatus = () => {
       return {
         icon: Wifi,
         text: 'Conectado',
-        className: 'online'
+        className: 'status-online'
       }
     }
     
     return {
       icon: WifiOff,
       text: 'Desconectado',
-      className: 'offline'
+      className: 'status-offline'
     }
   }
 
   const { icon: StatusIcon, text, className } = getStatusConfig()
 
   return (
-    <div className={`connection-status ${className}`}>
-      <StatusIcon size={16} className={isLoading ? 'spinner-border spinner-border-sm' : ''} />
+    <div className={className}>
+      <StatusIcon size={16} className={isLoading ? 'animate-spin' : ''} />
       <span>{text}</span>
     </div>
   )
