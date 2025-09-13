@@ -33,10 +33,8 @@ const ConnectionStatus = () => {
 
   return (
     <div className={`connection-status ${className}`}>
-      <StatusIcon 
-        className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} 
-      />
-      <span className="text-sm font-medium">{text}</span>
+      <StatusIcon size={16} className={isLoading ? 'spinner-border spinner-border-sm' : ''} />
+      <span>{text}</span>
     </div>
   )
 }

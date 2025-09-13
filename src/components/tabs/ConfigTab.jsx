@@ -122,120 +122,109 @@ const ConfigTab = () => {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="fade-in">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Configuración de URLs
-        </h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="h4 mb-0">Configuración de URLs</h2>
         <button
           onClick={() => refetch()}
           disabled={isLoading}
-          className="btn btn-secondary"
+          className="btn btn-outline-primary"
         >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <RefreshCw size={16} className={`me-2 ${isLoading ? 'spinner-border spinner-border-sm' : ''}`} />
           Recargar Config
         </button>
       </div>
 
       {/* Enlaces Globales */}
-      <div className="config-card">
-        <div className="flex items-center gap-2 mb-4">
-          <Globe className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">
-            Enlaces Globales (Aplicados a Todos los Sitios)
-          </h3>
+      <div className="card mb-4">
+        <div className="card-header d-flex align-items-center">
+          <Globe size={18} className="me-2 text-primary" />
+          <h5 className="card-title mb-0">Enlaces Globales (Aplicados a Todos los Sitios)</h5>
         </div>
-        
-        <div className="form-grid">
-          <div className="form-group">
-            <label htmlFor="whatsapp">WhatsApp (Único para todos):</label>
-            <input
-              id="whatsapp"
-              type="url"
-              value={formData.whatsappUrl}
-              onChange={(e) => handleInputChange('whatsappUrl', e.target.value)}
-              placeholder="https://wa.link/oy1xno"
-              className="form-control"
-            />
-            <small>Este enlace se aplicará automáticamente a los 4 sitios</small>
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="telegram">Telegram (Único para todos):</label>
-            <input
-              id="telegram"
-              type="url"
-              value={formData.telegramUrl}
-              onChange={(e) => handleInputChange('telegramUrl', e.target.value)}
-              placeholder="https://t.me/jugadirecto"
-              className="form-control"
-            />
-            <small>Este enlace se aplicará automáticamente a los 4 sitios</small>
+        <div className="card-body">
+          <div className="row">
+            <div className="col-md-6 mb-3">
+              <label htmlFor="whatsapp" className="form-label">WhatsApp (Único para todos):</label>
+              <input
+                id="whatsapp"
+                type="url"
+                value={formData.whatsappUrl}
+                onChange={(e) => handleInputChange('whatsappUrl', e.target.value)}
+                placeholder="https://wa.link/oy1xno"
+                className="form-control"
+              />
+              <div className="form-text">Este enlace se aplicará automáticamente a los 4 sitios</div>
+            </div>
+            
+            <div className="col-md-6 mb-3">
+              <label htmlFor="telegram" className="form-label">Telegram (Único para todos):</label>
+              <input
+                id="telegram"
+                type="url"
+                value={formData.telegramUrl}
+                onChange={(e) => handleInputChange('telegramUrl', e.target.value)}
+                placeholder="https://t.me/jugadirecto"
+                className="form-control"
+              />
+              <div className="form-text">Este enlace se aplicará automáticamente a los 4 sitios</div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Información de Sitios */}
-      <div className="config-card">
-        <div className="flex items-center gap-2 mb-4">
-          <Info className="w-5 h-5 text-green-600" />
-          <h3 className="text-lg font-semibold text-gray-900">
-            Configuración Automática de Sitios
-          </h3>
+      <div className="card mb-4">
+        <div className="card-header d-flex align-items-center">
+          <Info size={18} className="me-2 text-primary" />
+          <h5 className="card-title mb-0">Configuración Automática de Sitios</h5>
         </div>
-        
-        <p className="text-gray-600 mb-4">
-          Los 4 sitios se configuran automáticamente. Solo necesitas cambiar WhatsApp y Telegram:
-        </p>
-        
-        <div className="space-y-3">
-          {sitesMappingData.map((site, index) => (
-            <div 
-              key={index}
-              className={`p-3 rounded-lg border-2 ${
-                site.type === 'casino' 
-                  ? 'border-blue-200 bg-blue-50' 
-                  : 'border-green-200 bg-green-50'
-              }`}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <strong className="text-gray-900">{site.name}</strong>
-                  <span className="mx-2 text-gray-400">→</span>
-                  <code className="bg-gray-100 px-2 py-1 rounded text-sm">
-                    {site.url}
-                  </code>
+        <div className="card-body">
+          <p className="mb-4">Los 4 sitios se configuran automáticamente. Solo necesitas cambiar WhatsApp y Telegram:</p>
+          
+          <div className="row g-3">
+            {sitesMappingData.map((site, index) => (
+              <div className="col-md-6" key={index}>
+                <div className={`card h-100 ${site.type === 'casino' ? 'border-primary' : 'border-success'} border-opacity-25`}>
+                  <div className="card-body">
+                    <h5 className="card-title">{site.name}</h5>
+                    <div className="d-flex align-items-center mb-2">
+                      <span className="badge bg-secondary me-2">URL:</span>
+                      <code>{site.url}</code>
+                    </div>
+                    <p className="card-text small">{site.description}</p>
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mt-1">
-                {site.description}
-              </p>
-            </div>
-          ))}
-        </div>
-        
-        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-start gap-2">
-            <Info className="w-5 h-5 text-blue-600 mt-0.5" />
-            <div className="text-sm text-blue-800">
-              <strong>Configuración Simple:</strong>
-              <br />• Sitios 🎰 Casino (7 y 9): Muestran página completa con botones
-              <br />• Sitios 💬 WhatsApp (8 y 10): Redirigen directamente al WhatsApp
-              <br />• Solo cambias WhatsApp y Telegram arriba para actualizar todos automáticamente
+            ))}
+          </div>
+          
+          <div className="alert alert-info mt-4">
+            <div className="d-flex">
+              <div className="flex-shrink-0">
+                <Info size={24} />
+              </div>
+              <div className="ms-3">
+                <h6 className="alert-heading">Configuración Simple:</h6>
+                <ul className="mb-0 ps-3">
+                  <li>Sitios 🎰 Casino (7 y 9): Muestran página completa con botones</li>
+                  <li>Sitios 💬 WhatsApp (8 y 10): Redirigen directamente al WhatsApp</li>
+                  <li>Solo cambias WhatsApp y Telegram arriba para actualizar todos automáticamente</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Botón de guardar */}
-      <div className="flex justify-end">
+      <div className="d-flex justify-content-end">
         <button
           onClick={handleSaveConfig}
           disabled={updateConfig.isLoading}
           className="btn btn-primary"
         >
-          <Save className="w-4 h-4" />
+          <Save size={16} className="me-2" />
           {updateConfig.isLoading ? 'Guardando...' : 'Guardar Configuración'}
         </button>
       </div>

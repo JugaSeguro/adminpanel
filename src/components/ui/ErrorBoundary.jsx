@@ -22,34 +22,36 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full mx-4">
-            <div className="bg-white rounded-lg shadow-lg p-6 text-center">
-              <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-gray-900 mb-2">
-                ¡Oops! Algo salió mal
-              </h1>
-              <p className="text-gray-600 mb-6">
+        <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+          <div className="card shadow border-0 mx-2" style={{ maxWidth: '500px' }}>
+            <div className="card-body text-center p-5">
+              <div className="mb-4">
+                <AlertTriangle size={60} className="text-danger" />
+              </div>
+              <h2 className="card-title mb-3">¡Oops! Algo salió mal</h2>
+              <p className="card-text text-muted mb-4">
                 Ha ocurrido un error inesperado en la aplicación. 
                 Por favor, recarga la página para continuar.
               </p>
               <button
                 onClick={this.handleReload}
-                className="btn btn-primary inline-flex items-center gap-2"
+                className="btn btn-primary"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw size={16} className="me-2" />
                 Recargar Aplicación
               </button>
               
               {process.env.NODE_ENV === 'development' && (
-                <details className="mt-4 text-left">
-                  <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                    Ver detalles del error
-                  </summary>
-                  <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">
-                    {this.state.error?.toString()}
-                  </pre>
-                </details>
+                <div className="mt-4 text-start">
+                  <details className="mt-3">
+                    <summary className="text-muted small cursor-pointer">
+                      Ver detalles del error
+                    </summary>
+                    <pre className="mt-2 p-3 bg-light rounded small text-danger overflow-auto" style={{ maxHeight: '200px' }}>
+                      {this.state.error?.toString()}
+                    </pre>
+                  </details>
+                </div>
               )}
             </div>
           </div>

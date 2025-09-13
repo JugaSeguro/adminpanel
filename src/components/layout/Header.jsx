@@ -5,13 +5,15 @@ import ConnectionStatus from '../ui/ConnectionStatus'
 const Header = () => {
   return (
     <header className="admin-header">
-      <div className="flex items-center gap-2">
-        <Settings className="w-6 h-6 text-blue-600" />
-        <h1 className="text-xl font-bold text-gray-900">
-          Panel de Administración Casino
-        </h1>
+      <div className="container-fluid">
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            <Settings className="me-2" size={24} />
+            <h1 className="mb-0">Panel de Administración Casino</h1>
+          </div>
+          <ConnectionStatus />
+        </div>
       </div>
-      <ConnectionStatus />
     </header>
   )
 }

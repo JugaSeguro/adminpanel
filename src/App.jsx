@@ -32,16 +32,17 @@ function App() {
         <Navigation />
         
         <main className="admin-content">
-          <Suspense fallback={
-            <div className="flex items-center justify-center py-12">
-              <div className="flex items-center gap-2 text-gray-600">
-                <div className="spinner" />
-                <span>Cargando...</span>
+          <div className="container-fluid">
+            <Suspense fallback={
+              <div className="spinner-container">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Cargando...</span>
+                </div>
               </div>
-            </div>
-          }>
-            {renderActiveTab()}
-          </Suspense>
+            }>
+              {renderActiveTab()}
+            </Suspense>
+          </div>
         </main>
 
         {/* Overlay de loading global */}

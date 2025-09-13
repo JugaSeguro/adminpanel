@@ -34,17 +34,22 @@ const Navigation = () => {
 
   return (
     <nav className="admin-nav">
-      {tabs.map(({ id, label, icon: Icon, description }) => (
-        <button
-          key={id}
-          className={`nav-btn ${activeTab === id ? 'active' : ''}`}
-          onClick={() => setActiveTab(id)}
-          title={description}
-        >
-          <Icon className="w-4 h-4" />
-          <span>{label}</span>
-        </button>
-      ))}
+      <div className="container-fluid">
+        <ul className="nav nav-tabs border-0">
+          {tabs.map(({ id, label, icon: Icon, description }) => (
+            <li className="nav-item" key={id}>
+              <button
+                className={`nav-link ${activeTab === id ? 'active' : ''}`}
+                onClick={() => setActiveTab(id)}
+                title={description}
+              >
+                <Icon size={16} className="me-2" />
+                <span>{label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   )
 }
