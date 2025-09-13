@@ -4,11 +4,14 @@ import toast from 'react-hot-toast'
 const API_BASE = '/.netlify/functions'
 // Detectar modo desarrollo automáticamente
 const IS_DEVELOPMENT = import.meta.env.DEV
+// TEMPORAL: Forzar modo desarrollo para usar mocks siempre
+const USE_MOCKS = true
 
-console.log('🔧 Modo:', IS_DEVELOPMENT ? 'desarrollo (mocks)' : 'producción (APIs reales)', { env: import.meta.env.MODE })
+console.log('🔧 Modo:', USE_MOCKS ? 'desarrollo forzado (mocks)' : (IS_DEVELOPMENT ? 'desarrollo (mocks)' : 'producción (APIs reales)'), { env: import.meta.env.MODE })
 
 // Configuración mock para desarrollo
-const MOCK_CONFIG = {
+// Exportar para que pueda ser utilizado por useLocalStorage
+export const MOCK_CONFIG = {
   globalLinks: {
     whatsappUrl: "https://wa.link/oy1xno",
     telegramUrl: "https://t.me/jugadirecto",
@@ -61,9 +64,9 @@ const MOCK_CONFIG = {
 
 // Cliente fetch mejorado con fallback para desarrollo
 const apiClient = async (endpoint, options = {}) => {
-  // En desarrollo, usar datos mock directamente
-  if (IS_DEVELOPMENT) {
-    console.log(`🔧 Modo desarrollo: usando mock para ${endpoint}`)
+  // En desarrollo o si se fuerza el uso de mocks, usar datos mock directamente
+  if (USE_MOCKS || IS_DEVELOPMENT) {
+    console.log(`🔧 Usando mock para ${endpoint} (${USE_MOCKS ? 'forzado' : 'desarrollo'})`)
     return mockApiResponse(endpoint, options)
   }
   
@@ -89,6 +92,7 @@ const apiClient = async (endpoint, options = {}) => {
     console.error(`API Error [${endpoint}]:`, error)
     // Fallback a mock en caso de error
     console.log(`⚠️ Error en API, usando fallback mock para ${endpoint}`)
+    // Siempre usar mock como fallback en caso de error
     return mockApiResponse(endpoint, options)
   }
 }

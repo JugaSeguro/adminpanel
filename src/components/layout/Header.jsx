@@ -1,5 +1,6 @@
 import React from 'react'
 import { useLoadingState } from '../../hooks/useApi'
+import LocalStorageToggle from '../ui/LocalStorageToggle'
 
 const Header = () => {
   const { connectionStatus } = useLoadingState()
@@ -76,7 +77,8 @@ const Header = () => {
               </span>
             </div>
             
-
+            {/* Toggle para modo localStorage */}
+            <LocalStorageToggle />
           </div>
         </div>
       </div>

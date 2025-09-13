@@ -51,17 +51,62 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Ruta al archivo de configuración
-    const configPath = path.join(process.cwd(), 'shared', 'config.cjs');
+    // Ruta al archivo de configuración - probar diferentes rutas
+    let configPath = path.join(process.cwd(), 'shared', 'config.cjs');
     
-    // Leer configuración actual
+    // Si no existe, intentar con rutas alternativas
+    if (!fs.existsSync(configPath)) {
+      // Intentar con la ruta relativa desde la función
+      configPath = path.join(__dirname, '..', '..', 'shared', 'config.cjs');
+      
+      // Si sigue sin existir, intentar con otra ruta común en Netlify
+      if (!fs.existsSync(configPath)) {
+        configPath = path.join(process.cwd(), '..', 'shared', 'config.cjs');
+        
+        // Si todavía no existe, crear el directorio y un archivo de configuración inicial
+        if (!fs.existsSync(configPath)) {
+          console.log('Creando archivo de configuración inicial...');
+          
+          // Determinar la mejor ruta para crear el archivo
+          const sharedDir = path.join(process.cwd(), 'shared');
+          try {
+            // Intentar crear el directorio si no existe
+            if (!fs.existsSync(sharedDir)) {
+              fs.mkdirSync(sharedDir, { recursive: true });
+            }
+            configPath = path.join(sharedDir, 'config.cjs');
+          } catch (err) {
+            console.error('Error al crear directorio shared:', err);
+            return {
+              statusCode: 500,
+              headers,
+              body: JSON.stringify({
+                error: 'Error al crear directorio de configuración',
+                message: err.message
+              })
+            };
+          }
+        }
+      }
+    }
+    
+    // Leer configuración actual o inicializar una nueva
     let currentConfig = {};
     if (fs.existsSync(configPath)) {
-      delete require.cache[configPath]; // Limpiar cache
-      const { CONFIG } = require(configPath);
-      if (CONFIG) {
-        currentConfig = CONFIG;
+      try {
+        delete require.cache[configPath]; // Limpiar cache
+        const { CONFIG } = require(configPath);
+        if (CONFIG) {
+          currentConfig = CONFIG;
+        }
+      } catch (err) {
+        console.warn('Error al leer configuración existente, usando configuración por defecto:', err.message);
+        // Inicializar con configuración por defecto si hay error
+        currentConfig = getDefaultConfig();
       }
+    } else {
+      // Si no existe el archivo, inicializar con configuración por defecto
+      currentConfig = getDefaultConfig();
     }
 
     // Validar y sanitizar textos
@@ -118,6 +163,75 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// Función para obtener configuración por defecto
+function getDefaultConfig() {
+  return {
+    meta: {
+      lastUpdated: new Date().toISOString(),
+      version: "1.0.0"
+    },
+    globalLinks: {
+      whatsappUrl: "https://wa.link/oy1xno",
+      telegramUrl: "https://t.me/jugadirecto",
+      xclubUrl: "https://1xclub.bet",
+      envivoUrl: "https://24envivo.com"
+    },
+    sites: {
+      "1xclub-links-casinos": {
+        brandName: "1XCLUB.BET",
+        siteName: "1xclub-links-casinos",
+        brandType: "1xclub",
+        mainUrl: "https://1xclub.bet",
+        whatsappUrl: "https://wa.link/oy1xno",
+        telegramUrl: "https://t.me/jugadirecto",
+        deployUrl: "https://7.registrogratis.online"
+      },
+      "1xclub-links-wsp": {
+        brandName: "1XCLUB.BET",
+        siteName: "1xclub-links-wsp",
+        brandType: "1xclub",
+        mainUrl: "https://1xclub.bet",
+        whatsappUrl: "https://wa.link/oy1xno",
+        telegramUrl: "https://t.me/jugadirecto",
+        deployUrl: "https://8.registrogratis.online"
+      },
+      "24envivo-links-casinos": {
+        brandName: "24ENVIVO.COM",
+        siteName: "24envivo-links-casinos",
+        brandType: "24envivo",
+        mainUrl: "https://24envivo.com",
+        whatsappUrl: "https://wa.link/oy1xno",
+        telegramUrl: "https://t.me/jugadirecto",
+        deployUrl: "https://9.registrogratis.online"
+      },
+      "24envivo-links-wsp": {
+        brandName: "24ENVIVO.COM",
+        siteName: "24envivo-links-wsp",
+        brandType: "24envivo",
+        mainUrl: "https://24envivo.com",
+        whatsappUrl: "https://wa.link/oy1xno",
+        telegramUrl: "https://t.me/jugadirecto",
+        deployUrl: "https://10.registrogratis.online"
+      }
+    },
+    texts: {
+      mainTitle: "Registrate gratis y pedi 2000 fichas para probar",
+      subtitle: "Crea tu cuenta rápido y seguro ✨",
+      registerButton: "REGISTRARSE GRATIS",
+      whatsappButton: "💬 Contactar por WhatsApp",
+      telegramButton: "📱 Unirse a Telegram",
+      features: [
+        "🎰 +1000 juegos de casino",
+        "🎲 Ruleta en vivo 24/7",
+        "🃏 Blackjack profesional",
+        "💰 Bonos diarios",
+        "🔒 100% seguro y confiable",
+        "📱 Juega desde tu celular"
+      ]
+    }
+  };
+}
 
 function sanitizeTexts(texts) {
   const sanitized = {};
