@@ -1,0 +1,79 @@
+[build]
+  command = "npm install && npm run build"
+  publish = "dist"
+  
+[build.environment]
+  NODE_ENV = "production"
+
+# Variables de entorno para build hooks de los sitios
+[context.production.environment]
+  BUILD_HOOK_1XCLUB_CASINOS = "https://api.netlify.com/build_hooks/YOUR_BUILD_HOOK_1XCLUB_CASINOS"
+  BUILD_HOOK_1XCLUB_WSP = "https://api.netlify.com/build_hooks/YOUR_BUILD_HOOK_1XCLUB_WSP"
+  BUILD_HOOK_24ENVIVO_CASINOS = "https://api.netlify.com/build_hooks/YOUR_BUILD_HOOK_24ENVIVO_CASINOS"
+  BUILD_HOOK_24ENVIVO_WSP = "https://api.netlify.com/build_hooks/YOUR_BUILD_HOOK_24ENVIVO_WSP"
+  NETLIFY_ACCESS_TOKEN = "YOUR_NETLIFY_ACCESS_TOKEN"
+
+# Reglas de redireccionamiento para SPA
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}
+
+# Fallback para todos los usuarios
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers para las funciones
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+# Headers de seguridad para la app
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.netlify.com https://*.registrogratis.online"
+
+# Cache para archivos estáticos
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Configuración de funciones
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "nft"
+
+# Configuración de notificaciones (opcional)
+[build.processing]
+  skip_processing = false
+
+# Deploy previews
+[context.deploy-preview]
+  command = "echo 'Deploy preview - usando configuración de desarrollo'"
+  
+[context.branch-deploy]
+  command = "echo 'Branch deploy - usando configuración de desarrollo'"
+
+
