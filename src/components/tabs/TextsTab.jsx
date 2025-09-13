@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Save, Type } from 'lucide-react'
-import { useConfig, useUpdateTexts } from '../../hooks/useApi'
+import { useConfig, useUpdateTexts, useDeployAllSites } from '../../hooks/useApi'
 import useAppStore from '../../store/useStore'
 import Button from '../ui/Button'
 import { FormSkeleton } from '../ui/SkeletonLoader'
@@ -8,7 +8,8 @@ import { FormSkeleton } from '../ui/SkeletonLoader'
 const TextsTab = () => {
   const { data: config, isLoading } = useConfig()
   const updateTexts = useUpdateTexts()
-  const { setLoading, getFallbackConfig } = useAppStore()
+  const deployAllSites = useDeployAllSites()
+  const { setLoading, getFallbackConfig, addDeployLog } = useAppStore()
   
   const [formData, setFormData] = useState({
     mainTitle: '',
@@ -75,6 +76,23 @@ const TextsTab = () => {
       }
 
       await updateTexts.mutateAsync(textsData)
+      addDeployLog('Textos actualizados en el servidor')
+      
+      // Preguntar si desea redesplegar
+      const shouldRedeploy = window.confirm(
+        '¿Deseas redesplegar todos los sitios ahora para aplicar los cambios de textos?'
+      )
+      
+      if (shouldRedeploy) {
+        setLoading(true, 'Desplegando sitios...')
+        try {
+          await deployAllSites.mutateAsync()
+          addDeployLog('Redespiegue completado exitosamente')
+        } catch (deployError) {
+          console.error('Error deploying sites:', deployError)
+          addDeployLog('Error en el redespiegue: ' + deployError.message)
+        }
+      }
       
     } catch (error) {
       console.error('Error saving texts:', error)

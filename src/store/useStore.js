@@ -1,10 +1,7 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 // Store para el estado de la aplicación
-const useAppStore = create(
-  persist(
-    (set, get) => ({
+const useAppStore = create((set, get) => ({
       // Estado de la UI
       activeTab: 'config',
       isLoading: false,
@@ -88,15 +85,7 @@ const useAppStore = create(
         loadingMessage: 'Procesando...',
         deployLogs: []
       })
-    }),
-    {
-      name: 'casino-admin-store',
-      partialize: (state) => ({
-        activeTab: state.activeTab,
-        deployLogs: state.deployLogs
-      })
-    }
-  )
+  })
 )
 
 export default useAppStore
