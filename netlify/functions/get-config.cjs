@@ -26,7 +26,7 @@ exports.handler = async (event, context) => {
 
   try {
     // Ruta al archivo de configuración compartida
-    const configPath = path.join(process.cwd(), 'shared', 'config.js');
+    const configPath = path.join(process.cwd(), 'shared', 'config.cjs');
     
     // Verificar si el archivo existe
     if (!fs.existsSync(configPath)) {
@@ -35,31 +35,27 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           error: 'Archivo de configuración no encontrado',
-          message: 'El archivo shared/config.js no existe'
+      message: 'El archivo shared/config.cjs no existe'
         })
       };
     }
 
-    // Leer el archivo de configuración
-    const configContent = fs.readFileSync(configPath, 'utf8');
+    // Importar la configuración usando require
+    delete require.cache[configPath]; // Limpiar cache para obtener la versión más reciente
+    const { CONFIG } = require(configPath);
     
-    // Extraer el objeto CONFIG del archivo usando regex
-    const configMatch = configContent.match(/export const CONFIG = ({[\s\S]*?});/);
-    
-    if (!configMatch) {
+    if (!CONFIG) {
       return {
         statusCode: 500,
         headers,
         body: JSON.stringify({
-          error: 'Error parsing configuración',
-          message: 'No se pudo extraer CONFIG del archivo'
+          error: 'Error al cargar configuración',
+          message: 'No se pudo cargar el objeto CONFIG del archivo'
         })
       };
     }
 
-    // Evaluar el objeto de configuración de forma segura
-    const configString = configMatch[1];
-    const config = eval(`(${configString})`);
+    const config = CONFIG;
 
     return {
       statusCode: 200,

@@ -2,6 +2,8 @@ import React from 'react'
 import { Rocket, Play, AlertCircle, CheckCircle, Clock, Zap, Globe, Activity, Sparkles } from 'lucide-react'
 import { useDeploySite, useDeployAllSites } from '../../hooks/useApi'
 import useAppStore from '../../store/useStore'
+import Button from '../ui/Button'
+import LoadingSpinner from '../ui/LoadingSpinner'
 
 const DeployTab = () => {
   const deploySite = useDeploySite()
@@ -62,6 +64,7 @@ const DeployTab = () => {
   }
 
   const getLogIcon = (message) => {
+    if (typeof message !== 'string') return <Clock className="w-4 h-4 text-gray-500" />
     if (message.includes('✅')) return <CheckCircle className="w-4 h-4 text-green-500" />
     if (message.includes('❌')) return <AlertCircle className="w-4 h-4 text-red-500" />
     if (message.includes('🚀')) return <Rocket className="w-4 h-4 text-blue-500" />
@@ -69,7 +72,7 @@ const DeployTab = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-3 md:p-6 space-y-4 md:space-y-8">
       {/* Elementos decorativos de fondo */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -77,34 +80,34 @@ const DeployTab = () => {
       </div>
 
       {/* Header con diseño moderno */}
-      <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-3xl shadow-xl overflow-hidden">
+      <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl md:rounded-3xl shadow-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
         
-        <div className="relative z-10 p-8">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-6 lg:space-y-0">
-            <div className="flex items-center space-x-4">
+        <div className="relative z-10 p-4 md:p-8">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
+            <div className="flex items-center space-x-3 md:space-x-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl blur-lg opacity-50 animate-pulse"></div>
-                <div className="relative p-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-                  <Rocket className="w-8 h-8 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl md:rounded-2xl blur-lg opacity-50 animate-pulse"></div>
+                <div className="relative p-2 md:p-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl md:rounded-2xl shadow-lg">
+                  <Rocket className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </div>
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                <h1 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                   Control de Despliegue
                 </h1>
-                <p className="text-slate-600 mt-1">Gestiona y despliega todos tus sitios web</p>
+                <p className="text-slate-600 mt-1 text-sm md:text-base">Gestiona y despliega todos tus sitios web</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-xl border border-green-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <div className="flex items-center space-x-2 px-3 md:px-4 py-2 bg-green-100 text-green-700 rounded-lg md:rounded-xl border border-green-200">
                 <Activity className="w-4 h-4" />
-                <span className="text-sm font-medium">Sistema Activo</span>
+                <span className="text-xs md:text-sm font-medium">Sistema Activo</span>
               </div>
-              <div className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-xl border border-blue-200">
+              <div className="flex items-center space-x-2 px-3 md:px-4 py-2 bg-blue-100 text-blue-700 rounded-lg md:rounded-xl border border-blue-200">
                 <Globe className="w-4 h-4" />
-                <span className="text-sm font-medium">{sites.length} Sitios</span>
+                <span className="text-xs md:text-sm font-medium">{sites.length} Sitios</span>
               </div>
             </div>
           </div>
@@ -115,18 +118,18 @@ const DeployTab = () => {
       <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-3xl shadow-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
         
-        <div className="relative z-10 p-8">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg">
-              <Zap className="w-6 h-6 text-white" />
+        <div className="relative z-10 p-4 md:p-8">
+          <div className="flex items-center space-x-3 mb-6 md:mb-8">
+            <div className="p-2 md:p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg md:rounded-xl shadow-lg">
+              <Zap className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-slate-800">Despliegue Individual</h3>
-              <p className="text-slate-600">Despliega sitios específicos de forma independiente</p>
+              <h3 className="text-lg md:text-2xl font-bold text-slate-800">Despliegue Individual</h3>
+              <p className="text-slate-600 text-sm md:text-base">Despliega sitios específicos de forma independiente</p>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {sites.map((site) => (
               <div key={site.id} className="group relative bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-6 hover:bg-white/80 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/20 rounded-2xl"></div>
@@ -149,32 +152,20 @@ const DeployTab = () => {
                     </div>
                   </div>
                   
-                  <button
+                  <Button
+                    variant="primary"
+                    size="lg"
                     onClick={() => handleDeploySite(site.id, site.name)}
-                    disabled={deploySite.isLoading}
-                    className={`w-full group/btn relative px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg ${
-                      deploySite.isLoading
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 hover:scale-105 hover:shadow-xl'
-                    }`}
+                    isLoading={deploySite.isLoading}
+                    loadingText="Desplegando..."
+                    icon={<Play className="w-5 h-5" />}
+                    className="w-full font-semibold relative overflow-hidden group/btn"
                   >
-                    {deploySite.isLoading ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Desplegando...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center space-x-2">
-                        <Play className="w-5 h-5 group-hover/btn:scale-110 transition-transform duration-300" />
-                        <span>Desplegar Sitio</span>
-                      </div>
-                    )}
+                    Desplegar Sitio
                     
                     {/* Efecto de brillo */}
-                    {!deploySite.isLoading && (
-                      <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                    )}
-                  </button>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000"></div>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -224,32 +215,20 @@ const DeployTab = () => {
               </div>
             </div>
             
-            <button
+            <Button
+              variant="warning"
+              size="xl"
               onClick={handleDeployAll}
-              disabled={deployAllSites.isLoading}
-              className={`group relative px-12 py-4 rounded-2xl font-bold text-xl transition-all duration-300 shadow-2xl ${
-                deployAllSites.isLoading
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 hover:scale-105 hover:shadow-2xl'
-              }`}
+              isLoading={deployAllSites.isLoading}
+              loadingText="Desplegando Todos..."
+              icon={<Rocket className="w-6 h-6" />}
+              className="font-bold text-xl relative overflow-hidden group px-12 py-4"
             >
-              {deployAllSites.isLoading ? (
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>Desplegando Todos...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <Rocket className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
-                  <span>Actualizar Todos los Sitios</span>
-                </div>
-              )}
+              Actualizar Todos los Sitios
               
               {/* Efecto de brillo */}
-              {!deployAllSites.isLoading && (
-                <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              )}
-            </button>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            </Button>
           </div>
         </div>
       </div>
@@ -303,14 +282,14 @@ const DeployTab = () => {
             ) : (
               <div className="space-y-3">
                 {deployLogs.map((log, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:bg-slate-800/70 transition-colors duration-200">
+                  <div key={log.id || index} className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:bg-slate-800/70 transition-colors duration-200">
                     <div className="flex-shrink-0 mt-0.5">
-                      {getLogIcon(log)}
+                      {getLogIcon(log.message)}
                     </div>
                     <span className="text-slate-400 font-mono text-xs mt-1 min-w-[80px]">
-                      {new Date().toLocaleTimeString()}
+                      {log.timestamp || new Date().toLocaleTimeString()}
                     </span>
-                    <span className="text-slate-200 flex-1 font-medium leading-relaxed">{log}</span>
+                    <span className="text-slate-200 flex-1 font-medium leading-relaxed">{log.message}</span>
                   </div>
                 ))}
               </div>

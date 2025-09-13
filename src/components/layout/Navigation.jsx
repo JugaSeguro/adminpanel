@@ -60,23 +60,26 @@ const Navigation = () => {
   ]
 
   return (
-    <nav className="relative bg-white/50 backdrop-blur-sm border-b border-white/20 shadow-lg">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-slate-700">Panel de Control</h2>
-          <div className="text-sm text-slate-500">
+    <nav className="relative bg-white/50 backdrop-blur-sm border-b border-white/20 shadow-lg animate-fade-in">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-800">
+            <span className="hidden sm:inline">Panel de Control</span>
+            <span className="sm:hidden">Panel</span>
+          </h2>
+          <div className="text-xs sm:text-sm text-slate-600 hidden md:block">
             {tabs.find(tab => tab.id === activeTab)?.description}
           </div>
         </div>
         
         <div className="relative">
-          <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
+          <div className="flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide pb-2 animate-slide-in-left">
             {tabs.map(({ id, label, icon, description, color, bgColor, borderColor }, index) => (
               <button
                 key={id}
-                className={`group relative flex items-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 whitespace-nowrap ${
+                className={`group relative flex items-center space-x-2 sm:space-x-3 px-3 sm:px-6 py-3 sm:py-4 rounded-xl font-medium transition-all duration-300 whitespace-nowrap hover-scale hover-lift ${
                   activeTab === id
-                    ? `bg-gradient-to-r ${color} text-white shadow-lg scale-105 transform`
+                    ? `bg-gradient-to-r ${color} text-white shadow-lg scale-105 transform animate-pulse`
                     : `${bgColor} ${borderColor} border text-slate-600 hover:text-slate-800 hover:scale-105 hover:shadow-md`
                 }`}
                 onClick={() => setActiveTab(id)}
@@ -98,7 +101,8 @@ const Navigation = () => {
                 </div>
                 
                 {/* Label */}
-                <span className="relative z-10 font-semibold">{label}</span>
+                <span className="relative z-10 font-semibold hidden sm:inline">{label}</span>
+                <span className="relative z-10 font-semibold text-xs sm:hidden">{label.split(' ')[0]}</span>
                 
                 {/* Badge de notificación (ejemplo) */}
                 {id === 'sites' && (

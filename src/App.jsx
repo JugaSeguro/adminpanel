@@ -46,29 +46,29 @@ function App() {
           <Header />
           <Navigation />
           
-          <main className="flex-1 p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
+          <main className="flex-1 p-3 sm:p-6 animate-fade-in">
+            <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-slide-in-left">
               {/* Tarjeta principal con glassmorphism mejorado */}
               <div className="relative group">
                 {/* Glow effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 rounded-3xl blur-xl opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 rounded-2xl sm:rounded-3xl blur-xl opacity-25 group-hover:opacity-40 transition duration-1000"></div>
                 
                 {/* Contenido principal */}
-                <div className="relative bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden">
+                <div className="relative bg-white/70 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl border border-white/30 overflow-hidden">
                   {/* Header decorativo */}
                   <div className="h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500"></div>
                   
-                  <div className="p-8">
+                  <div className="p-4 sm:p-6 lg:p-8">
                     <Suspense fallback={
-                      <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                      <div className="flex flex-col items-center justify-center py-8 sm:py-12 lg:py-16 space-y-4 animate-fade-in">
                         {/* Spinner moderno */}
                         <div className="relative">
-                          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                          <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-purple-600 rounded-full animate-spin animate-reverse"></div>
+                          <div className="w-12 sm:w-16 h-12 sm:h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                          <div className="absolute inset-0 w-12 sm:w-16 h-12 sm:h-16 border-4 border-transparent border-r-purple-600 rounded-full animate-spin animate-reverse"></div>
                         </div>
                         <div className="text-center space-y-2">
-                          <p className="text-slate-600 font-semibold text-lg">Cargando panel de administración</p>
-                          <p className="text-slate-400 text-sm">Preparando la interfaz...</p>
+                          <p className="text-slate-600 font-semibold text-base sm:text-lg animate-pulse">Cargando panel de administración</p>
+                          <p className="text-slate-400 text-xs sm:text-sm">Preparando la interfaz...</p>
                         </div>
                       </div>
                     }>
@@ -79,10 +79,10 @@ function App() {
               </div>
               
               {/* Footer decorativo */}
-              <div className="text-center py-4">
-                <p className="text-slate-500 text-sm font-medium">
-                  Casino Admin Panel • Versión 2.0 • 
-                  <span className="text-blue-600">Powered by React & Tailwind</span>
+              <div className="text-center py-3 sm:py-4 animate-fade-in">
+                <p className="text-slate-500 text-xs sm:text-sm font-medium hover-scale">
+                  <span className="hidden sm:inline">Casino Admin Panel • Versión 2.0 • </span>
+                  <span className="text-blue-600 hover:text-blue-700 transition-colors">Powered by React & Tailwind</span>
                 </p>
               </div>
             </div>

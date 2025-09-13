@@ -3,6 +3,8 @@ import { RefreshCw, Save, Globe, Info, Link, MessageCircle, Send, Sparkles } fro
 import { useConfig, useUpdateConfig } from '../../hooks/useApi'
 import useAppStore from '../../store/useStore'
 import toast from 'react-hot-toast'
+import Button from '../ui/Button'
+import { SiteCardSkeleton } from '../ui/SkeletonLoader'
 
 const ConfigTab = () => {
   const { data: config, isLoading, refetch } = useConfig()
@@ -148,30 +150,33 @@ const ConfigTab = () => {
   ]
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-4 md:space-y-8 animate-fade-in p-3 md:p-0">
       {/* Header con gradiente */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border border-white/20 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl md:rounded-2xl p-4 md:p-8 border border-white/20 shadow-xl">
         <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
-        <div className="relative z-10 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-              <Globe className="w-6 h-6 text-white" />
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+          <div className="flex items-center space-x-3 md:space-x-4">
+            <div className="p-2 md:p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg md:rounded-xl shadow-lg">
+              <Globe className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Configuración de URLs
               </h2>
-              <p className="text-slate-600 mt-1">Gestiona los enlaces globales de todos los sitios</p>
+              <p className="text-slate-600 mt-1 text-sm md:text-base">Gestiona los enlaces globales de todos los sitios</p>
             </div>
           </div>
-          <button
+          <Button
+            variant="secondary"
+            size="md"
             onClick={() => refetch()}
-            disabled={isLoading}
-            className="group relative px-6 py-3 bg-white/80 backdrop-blur-sm border border-white/30 rounded-xl font-medium text-slate-700 hover:bg-white/90 hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            isLoading={isLoading}
+            loadingText="Recargando..."
+            icon={<RefreshCw className="w-4 h-4" />}
+            className="text-sm md:text-base"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 inline ${isLoading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
             Recargar Config
-          </button>
+          </Button>
         </div>
         
         {/* Elementos decorativos */}
@@ -183,7 +188,7 @@ const ConfigTab = () => {
       <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
         
-        <div className="relative z-10 p-8">
+        <div className="relative z-10 p-4 md:p-8">
           <div className="flex items-center space-x-3 mb-8">
             <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg">
               <Link className="w-5 h-5 text-white" />
@@ -193,7 +198,7 @@ const ConfigTab = () => {
             <span className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">Aplicados a todos los sitios</span>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
             {/* WhatsApp Input */}
             <div className="group">
               <label className="flex items-center space-x-2 text-sm font-semibold text-slate-700 mb-3">
@@ -206,7 +211,7 @@ const ConfigTab = () => {
                   value={formData.whatsappUrl}
                   onChange={(e) => handleInputChange('whatsappUrl', e.target.value)}
                   placeholder="https://wa.link/oy1xno"
-                  className={`w-full px-4 py-4 bg-white/80 border-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 group-hover:bg-white/90 ${
+                  className={`w-full px-3 md:px-4 py-3 md:py-4 bg-white/80 border-2 rounded-lg md:rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 group-hover:bg-white/90 text-sm md:text-base ${
                     validateUrl(formData.whatsappUrl, 'whatsapp').isValid ? 'border-green-200' : 'border-red-200'
                   }`}
                 />
@@ -239,7 +244,7 @@ const ConfigTab = () => {
                   value={formData.telegramUrl}
                   onChange={(e) => handleInputChange('telegramUrl', e.target.value)}
                   placeholder="https://t.me/jugadirecto"
-                  className={`w-full px-4 py-4 bg-white/80 border-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 group-hover:bg-white/90 ${
+                  className={`w-full px-3 md:px-4 py-3 md:py-4 bg-white/80 border-2 rounded-lg md:rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 group-hover:bg-white/90 text-sm md:text-base ${
                     validateUrl(formData.telegramUrl, 'telegram').isValid ? 'border-blue-200' : 'border-red-200'
                   }`}
                 />
@@ -278,7 +283,7 @@ const ConfigTab = () => {
           </div>
           
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 rounded-xl p-6 mb-8">
-            <div className="flex items-start space-x-4">
+            <div className="flex items-start space-x-3 md:space-x-4">
               <div className="p-2 bg-blue-500 rounded-lg">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
@@ -303,10 +308,10 @@ const ConfigTab = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {sitesMappingData.map((site, index) => (
               <div key={index} className="group">
-                <div className={`relative bg-white/80 backdrop-blur-sm border-2 rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                <div className={`relative bg-white/80 backdrop-blur-sm border-2 rounded-lg md:rounded-xl p-4 md:p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg ${
                   site.type === 'casino' 
                     ? 'border-blue-200 hover:border-blue-300 hover:bg-blue-50/50' 
                     : 'border-green-200 hover:border-green-300 hover:bg-green-50/50'
@@ -321,7 +326,7 @@ const ConfigTab = () => {
                     </div>
                     <div className="flex-1">
                       <h5 className="font-bold text-slate-800 mb-2">{site.name}</h5>
-                      <div className="flex items-center space-x-2 mb-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-3">
                         <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
                           site.type === 'casino' 
                             ? 'bg-blue-100 text-blue-700' 
@@ -352,8 +357,8 @@ const ConfigTab = () => {
       <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
         
-        <div className="relative z-10 p-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-6">
+        <div className="relative z-10 p-4 md:p-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0 lg:space-x-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg shadow-lg">
                 <Save className="w-5 h-5 text-white" />
@@ -364,7 +369,7 @@ const ConfigTab = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 md:space-x-4">
               {/* Indicador de validación */}
               <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
                 isFormValid 
@@ -380,32 +385,21 @@ const ConfigTab = () => {
               </div>
               
               {/* Botón de guardar */}
-              <button
+              <Button
+                variant="primary"
+                size="lg"
                 onClick={handleSaveConfig}
-                disabled={updateConfig.isLoading || !isFormValid}
-                className={`group relative px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg ${
-                  updateConfig.isLoading || !isFormValid
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 hover:scale-105 hover:shadow-xl'
-                }`}
+                isLoading={updateConfig.isLoading}
+                disabled={!isFormValid}
+                loadingText="Guardando..."
+                icon={<Save className="w-5 h-5" />}
+                className="text-sm md:text-base font-semibold relative overflow-hidden"
               >
-                {updateConfig.isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Guardando...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <Save className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
-                    <span>Guardar Configuración</span>
-                  </div>
-                )}
+                Guardar Configuración
                 
                 {/* Efecto de brillo */}
-                {!updateConfig.isLoading && isFormValid && (
-                  <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                )}
-              </button>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              </Button>
             </div>
           </div>
         </div>

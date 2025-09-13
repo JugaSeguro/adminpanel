@@ -52,15 +52,15 @@ exports.handler = async (event, context) => {
     }
 
     // Ruta al archivo de configuración
-    const configPath = path.join(process.cwd(), 'shared', 'config.js');
+    const configPath = path.join(process.cwd(), 'shared', 'config.cjs');
     
     // Leer configuración actual
     let currentConfig = {};
     if (fs.existsSync(configPath)) {
-      const configContent = fs.readFileSync(configPath, 'utf8');
-      const configMatch = configContent.match(/export const CONFIG = ({[\s\S]*?});/);
-      if (configMatch) {
-        currentConfig = eval(`(${configMatch[1]})`);
+      delete require.cache[configPath]; // Limpiar cache
+      const { CONFIG } = require(configPath);
+      if (CONFIG) {
+        currentConfig = CONFIG;
       }
     }
 
@@ -160,10 +160,10 @@ function generateConfigFile(config) {
  * Última actualización: ${config.meta?.lastUpdated || new Date().toISOString()}
  */
 
-export const CONFIG = ${JSON.stringify(config, null, 2)};
+const CONFIG = ${JSON.stringify(config, null, 2)};
 
 // Función helper para obtener configuración por sitio
-export function getSiteConfig(siteName) {
+function getSiteConfig(siteName) {
   const siteConfig = CONFIG.sites[siteName];
   if (!siteConfig) {
     console.error(\`Configuración no encontrada para sitio: \${siteName}\`);
@@ -173,7 +173,7 @@ export function getSiteConfig(siteName) {
 }
 
 // Configuración por defecto como fallback
-export function getDefaultConfig(siteName) {
+function getDefaultConfig(siteName) {
   const isXclub = siteName.includes('1xclub');
   return {
     mainUrl: isXclub ? "https://1xclub.bet" : "https://24envivo.com",
@@ -185,12 +185,18 @@ export function getDefaultConfig(siteName) {
 }
 
 // Función para validar configuración
-export function validateConfig(config) {
+function validateConfig(config) {
   const required = ['mainUrl', 'whatsappUrl', 'telegramUrl', 'brandName'];
   return required.every(field => config[field] && config[field].length > 0);
 }
 
-export default CONFIG;`;
+// Exportar usando CommonJS
+module.exports = {
+  CONFIG,
+  getSiteConfig,
+  getDefaultConfig,
+  validateConfig
+};`;
 }
 
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Save, Type } from 'lucide-react'
 import { useConfig, useUpdateTexts } from '../../hooks/useApi'
 import useAppStore from '../../store/useStore'
+import Button from '../ui/Button'
+import { FormSkeleton } from '../ui/SkeletonLoader'
 
 const TextsTab = () => {
   const { data: config, isLoading } = useConfig()
@@ -142,23 +144,23 @@ const TextsTab = () => {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 p-3 md:p-0">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Type className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-900">
+          <Type className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900">
             Configuración de Textos y Botones
           </h2>
         </div>
       </div>
 
       {/* Formulario de textos */}
-      <div className="config-card">
-        <div className="space-y-6">
+      <div className="config-card p-4 md:p-6">
+        <div className="space-y-4 md:space-y-6">
           {textFields.map((field) => (
             <div key={field.id} className="form-group">
-              <label htmlFor={field.id} className="text-sm font-medium text-gray-700">
+              <label htmlFor={field.id} className="text-xs md:text-sm font-medium text-gray-700">
                 {field.label}:
               </label>
               
@@ -169,7 +171,7 @@ const TextsTab = () => {
                   onChange={(e) => handleInputChange(field.id, e.target.value)}
                   placeholder={field.placeholder}
                   rows={field.rows || 3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 md:py-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
                 />
               ) : (
                 <input
@@ -178,12 +180,12 @@ const TextsTab = () => {
                   value={formData[field.id]}
                   onChange={(e) => handleInputChange(field.id, e.target.value)}
                   placeholder={field.placeholder}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 md:py-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
                 />
               )}
               
               {field.description && (
-                <small className="text-gray-500 text-sm">
+                <small className="text-gray-500 text-xs md:text-sm">
                   {field.description}
                 </small>
               )}
@@ -193,23 +195,23 @@ const TextsTab = () => {
       </div>
 
       {/* Preview de variables */}
-      <div className="config-card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">
+      <div className="config-card p-4 md:p-6">
+        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Variables Disponibles
         </h3>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm">
             <div>
               <strong className="text-gray-700">{'{BRAND}'}</strong>
               <p className="text-gray-600">Se reemplaza por:</p>
-              <ul className="list-disc list-inside text-gray-600 ml-2">
+              <ul className="list-disc list-inside text-gray-600 ml-2 space-y-1">
                 <li>1XCLUB.BET (para sitios 1xclub)</li>
                 <li>24ENVIVO.COM (para sitios 24envivo)</li>
               </ul>
             </div>
             <div>
               <strong className="text-gray-700">Emojis recomendados:</strong>
-              <p className="text-gray-600">
+              <p className="text-gray-600 break-all">
                 🔥 💰 🎰 🎯 ⚡ 💎 🏆 🚀 📱 ✨ 💸 🎊
               </p>
             </div>
@@ -219,14 +221,18 @@ const TextsTab = () => {
 
       {/* Botón de guardar */}
       <div className="flex justify-end">
-        <button
+        <Button
+          variant="primary"
+          size="md"
           onClick={handleSaveTexts}
-          disabled={updateTexts.isLoading}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          isLoading={updateTexts.isLoading}
+          loadingText="Guardando..."
+          icon={<Save className="w-4 h-4" />}
+          className="text-sm md:text-base"
         >
-          <Save className="w-4 h-4" />
-          {updateTexts.isLoading ? 'Guardando...' : 'Guardar Textos'}
-        </button>
+          <span className="hidden sm:inline">Guardar Textos</span>
+          <span className="sm:hidden">Guardar</span>
+        </Button>
       </div>
     </div>
   )

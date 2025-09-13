@@ -56,7 +56,7 @@
 # Configuración de funciones
 [functions]
   directory = "netlify/functions"
-  node_bundler = "nft"
+  node_bundler = "esbuild"
 
 # Configuración de notificaciones (opcional)
 [build.processing]
