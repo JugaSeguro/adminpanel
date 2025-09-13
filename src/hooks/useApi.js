@@ -118,6 +118,19 @@ const mockApiResponse = async (endpoint, options = {}) => {
       }
     
     case '/update-config':
+      // Actualizar la configuración mock con los datos recibidos
+      const configData = JSON.parse(options.body || '{}')
+      
+      if (configData.globalLinks) {
+        // Actualizar los enlaces globales
+        Object.assign(MOCK_CONFIG.globalLinks, configData.globalLinks)
+      }
+      
+      if (configData.sites) {
+        // Actualizar los sitios
+        Object.assign(MOCK_CONFIG.sites, configData.sites)
+      }
+      
       return {
         success: true,
         message: 'Configuración actualizada (modo desarrollo)',
@@ -126,10 +139,16 @@ const mockApiResponse = async (endpoint, options = {}) => {
     
     case '/update-texts':
       const textsData = JSON.parse(options.body || '{}').texts
+      
+      // Actualizar los textos en la configuración mock
+      if (textsData) {
+        Object.assign(MOCK_CONFIG.texts, textsData)
+      }
+      
       return {
         success: true,
         message: 'Textos actualizados (modo desarrollo)',
-        texts: textsData
+        texts: MOCK_CONFIG.texts
       }
     
     case '/check-sites-status':
