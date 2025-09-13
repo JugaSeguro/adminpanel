@@ -44,6 +44,18 @@ const MOCK_CONFIG = {
       mainUrl: "https://24envivo.com",
       deployUrl: "https://10.registrogratis.online"
     }
+  },
+  texts: {
+    mainTitle: "Registrate gratis y pedi 2000 fichas para probar",
+    subtitle: "Crea tu cuenta rápido y seguro ✨",
+    description: "Regístrate totalmente gratis en la plataforma más segura de Argentina. Contamos con más de 12000 Slots, la mejor deportiva y el mejor casino en vivo.",
+    buttons: {
+      bonus: "🔥 ¡OBTENÉ TU MEGABONUS CON TU PRIMER RECARGA 🔥",
+      register: "¡REGISTRATE AHORA!",
+      access: "🎯 ACCEDER A {BRAND} 🎯",
+      chat: "Chatear con nosotros"
+    },
+    telegram: "📱 SEGUINOS EN TELEGRAM Y GANÁ PREMIOS DIARIOS 📱"
   }
 }
 
@@ -106,6 +118,14 @@ const mockApiResponse = async (endpoint, options = {}) => {
         success: true,
         message: 'Configuración actualizada (modo desarrollo)',
         config: MOCK_CONFIG
+      }
+    
+    case '/update-texts':
+      const textsData = JSON.parse(options.body || '{}').texts
+      return {
+        success: true,
+        message: 'Textos actualizados (modo desarrollo)',
+        texts: textsData
       }
     
     case '/check-sites-status':
