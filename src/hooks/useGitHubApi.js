@@ -85,8 +85,15 @@ export const readRepositoryFile = async (siteName) => {
   try {
     const fileData = await githubClient(`/repos/${repo.owner}/${repo.repo}/contents/${repo.filePath}`)
     
-    // Decodificar el contenido base64
-    const content = atob(fileData.content)
+    // Decodificar el contenido base64 correctamente con UTF-8
+    const base64Content = fileData.content.replace(/\s/g, '')
+    const binaryString = atob(base64Content)
+    const bytes = new Uint8Array(binaryString.length)
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i)
+    }
+    const decoder = new TextDecoder('utf-8')
+    const content = decoder.decode(bytes)
     
     return {
       content,
@@ -110,8 +117,10 @@ export const updateRepositoryFile = async (siteName, newContent, commitMessage) 
     // Primero leer el archivo para obtener el SHA
     const fileData = await readRepositoryFile(siteName)
     
-    // Codificar el contenido en base64
-    const encodedContent = btoa(newContent)
+    // Codificar el contenido correctamente en UTF-8 y luego Base64
+    const encoder = new TextEncoder()
+    const utf8Bytes = encoder.encode(newContent)
+    const encodedContent = btoa(String.fromCharCode(...utf8Bytes))
     
     // Actualizar el archivo
     const updateData = await githubClient(`/repos/${repo.owner}/${repo.repo}/contents/${repo.filePath}`, {
