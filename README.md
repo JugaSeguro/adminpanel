@@ -233,12 +233,14 @@ Ver [MIGRATION_TO_REACT.md](./MIGRATION_TO_REACT.md) para detalles completos de 
 ## 🚀 Deploy
 
 ### Netlify (Recomendado)
-1. Conectar repositorio GitHub
-2. Configurar variables de entorno
-3. Deploy automático desde `main`
+1. Configurar variables de entorno
+2. Deploy automático
+3. Configurar Supabase para gestión de enlaces
 
 ### Variables de Entorno Requeridas
 ```bash
+VITE_SUPABASE_URL=https://[proyecto].supabase.co
+VITE_SUPABASE_ANON_KEY=[clave_anonima]
 BUILD_HOOK_1XCLUB_CASINOS=https://api.netlify.com/build_hooks/[ID]
 BUILD_HOOK_1XCLUB_WSP=https://api.netlify.com/build_hooks/[ID]
 BUILD_HOOK_24ENVIVO_CASINOS=https://api.netlify.com/build_hooks/[ID]
@@ -270,11 +272,11 @@ npm run preview
 
 ## 🤝 Contribución
 
-1. Fork el repositorio
-2. Crear feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit cambios (`git commit -m 'Add amazing feature'`)
-4. Push a branch (`git push origin feature/amazing-feature`)
-5. Abrir Pull Request
+1. Clonar el repositorio
+2. Instalar dependencias (`npm install`)
+3. Configurar variables de entorno
+4. Desarrollar nuevas funcionalidades
+5. Probar cambios localmente
 
 ## 📝 Licencia
 

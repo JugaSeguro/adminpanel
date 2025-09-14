@@ -1,80 +1,119 @@
-import React, { Suspense } from 'react'
-import Header from './components/layout/Header'
-import LoadingOverlay from './components/ui/LoadingOverlay'
-import ErrorBoundary from './components/ui/ErrorBoundary'
-import useAppStore from './store/useStore'
+import React, { Suspense, useState } from 'react'
+import Navigation from './components/layout/Navigation'
+import './App.css'
 
-// Solo cargar la pestaña de GitHub
-const GitHubConfigTab = React.lazy(() => import('./components/tabs/GitHubConfigTab'))
+// Lazy load components
+const SupabaseLinksTab = React.lazy(() => import('./components/tabs/SupabaseLinksTab'))
 
 function App() {
-  const { isLoading } = useAppStore()
+  const [activeTab, setActiveTab] = useState('dashboard')
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      {/* Fondo decorativo animado */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
-        <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
-        <div className="absolute bottom-0 left-1/3 w-[300px] h-[300px] bg-gradient-to-r from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl translate-y-1/2 animate-pulse"></div>
-      </div>
-      
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 opacity-40" style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.02) 1px, transparent 0)`,
-        backgroundSize: '60px 60px'
-      }}></div>
-      
-      {/* Contenido principal */}
-      <div className="relative z-10 flex flex-col min-h-screen">
-        <ErrorBoundary>
-          <Header />
-          
-          <main className="flex-1 p-3 sm:p-6 animate-fade-in">
-            <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-slide-in-left">
-              {/* Tarjeta principal con glassmorphism mejorado */}
-              <div className="relative group">
-                {/* Glow effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 rounded-2xl sm:rounded-3xl blur-xl opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-                
-                {/* Contenido principal */}
-                <div className="relative bg-white/70 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl border border-white/30 overflow-hidden">
-                  {/* Header decorativo */}
-                  <div className="h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500"></div>
-                  
-                  <div className="p-4 sm:p-6 lg:p-8">
-                    <Suspense fallback={
-                      <div className="flex flex-col items-center justify-center py-8 sm:py-12 lg:py-16 space-y-4 animate-fade-in">
-                        {/* Spinner moderno */}
-                        <div className="relative">
-                          <div className="w-12 sm:w-16 h-12 sm:h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                          <div className="absolute inset-0 w-12 sm:w-16 h-12 sm:h-16 border-4 border-transparent border-r-purple-600 rounded-full animate-spin animate-reverse"></div>
-                        </div>
-                        <div className="text-center space-y-2">
-                          <p className="text-slate-600 font-semibold text-base sm:text-lg animate-pulse">Cargando panel de administración</p>
-                          <p className="text-slate-400 text-xs sm:text-sm">Preparando la interfaz...</p>
-                        </div>
-                      </div>
-                    }>
-                      <GitHubConfigTab />
-                    </Suspense>
-                  </div>
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'supabase-links':
+        return <SupabaseLinksTab />
+      case 'settings':
+        return (
+          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-slate-800 mb-2">Configuración</h3>
+            <p className="text-slate-600">Panel de configuración general del sistema</p>
+          </div>
+        )
+      default: // dashboard
+        return (
+          <div className="space-y-6">
+            {/* Dashboard Header */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6a2 2 0 01-2 2H10a2 2 0 01-2-2V5z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-800">Panel de Control</h2>
+                  <p className="text-slate-600">Gestión centralizada de enlaces WhatsApp con Supabase</p>
                 </div>
               </div>
-              
-              {/* Footer decorativo */}
-              <div className="text-center py-3 sm:py-4 animate-fade-in">
-                <p className="text-slate-500 text-xs sm:text-sm font-medium hover-scale">
-                  <span className="hidden sm:inline">Casino Admin Panel • Versión 2.0 • </span>
-                  <span className="text-blue-600 hover:text-blue-700 transition-colors">Powered by React & Tailwind</span>
-                </p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
+              <button
+                onClick={() => setActiveTab('supabase-links')}
+                className="bg-white rounded-xl border border-slate-200 p-6 text-left hover:border-blue-300 hover:shadow-md transition-all group"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">Gestionar Enlaces</h3>
+                    <p className="text-sm text-slate-600">Configurar enlaces de WhatsApp y Casinos</p>
+                  </div>
+                </div>
+              </button>
+
+
+            </div>
+
+            {/* System Status */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-800 mb-4">Estado del Sistema</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-slate-600">Supabase Conectado</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm text-slate-600">Admin Panel Operativo</span>
+                </div>
               </div>
             </div>
-          </main>
+          </div>
+        )
+    }
+  }
 
-          {/* Overlay de loading global */}
-          {isLoading && <LoadingOverlay />}
-        </ErrorBoundary>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">
+              Panel de Administración
+            </h1>
+            <p className="text-slate-600">
+              Gestión de enlaces y configuración con Supabase
+            </p>
+          </div>
+
+          {/* Navigation */}
+          <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {/* Main Content */}
+          <div className="mt-8">
+            <Suspense fallback={
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <span className="ml-3 text-slate-600">Cargando...</span>
+              </div>
+            }>
+              {renderTabContent()}
+            </Suspense>
+          </div>
+        </div>
       </div>
     </div>
   )
