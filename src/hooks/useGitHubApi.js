@@ -172,20 +172,22 @@ export const updateWhatsAppLink = async (siteName, newWhatsAppUrl) => {
     const repoInfo = REPOSITORIES[siteName]
     const structureType = repoInfo?.type || 'wsp'
     
-    // Patrones específicos para encontrar SOLO links de WhatsApp en contextos correctos
+    // Patrones MUY específicos para encontrar SOLO links de WhatsApp en contextos correctos
     const whatsappPatterns = [
       // Patrón para onClick con currentConfig.whatsappUrl
       /(onClick.*window\.open\()(currentConfig\.whatsappUrl)(\))/g,
       // Patrón para onClick con globalConfig.whatsapp  
       /(onClick.*window\.open\()(globalConfig\.whatsapp)(\))/g,
-      // Patrón para configuraciones directas
+      // Patrón para configuraciones directas whatsappUrl
       /(whatsappUrl:\s*['"])(https:\/\/wa\.link\/[^"']+)(['"])/g,
       // Patrón para globalConfig.whatsapp en configuraciones
-      /(whatsapp:\s*['"])(https:\/\/wa\.link\/[^"']+)(['"])/g
+      /(whatsapp:\s*['"])(https:\/\/wa\.link\/[^"']+)(['"])/g,
+      // Patrón para fallback en onClick
+      /(globalConfig\.whatsapp\s*\|\|\s*['"])(https:\/\/wa\.link\/[^"']+)(['"])/g
     ]
     
-    // Patrón fallback simple
-    const fallbackPattern = /https:\/\/wa\.link\/[^"'\s)]+/g
+    // Patrón fallback simple PERO solo en contextos específicos
+    const fallbackPattern = /(https:\/\/wa\.link\/[^"'\s)]+)(?=\s*['"]?\s*[,}\)])/g
     
     let newContent = content
     let replacementCount = 0
@@ -202,11 +204,10 @@ export const updateWhatsAppLink = async (siteName, newWhatsAppUrl) => {
         
         newContent = newContent.replace(pattern, (match, prefix, middle, suffix) => {
           replacementCount++
-          // Para patrones que solo tienen el link, reemplazar directamente
+          // Reemplazar solo el link de WhatsApp, mantener todo lo demás
           if (match.includes('https://wa.link/')) {
             return match.replace(/https:\/\/wa\.link\/[^"'\s)]+/, newWhatsAppUrl)
           }
-          // Para patrones con variables, mantener la estructura
           return match
         })
         
@@ -214,15 +215,42 @@ export const updateWhatsAppLink = async (siteName, newWhatsAppUrl) => {
       }
     }
     
-    // Si no se encontró nada con patrones específicos, usar fallback
+    // Si no se encontró nada con patrones específicos, usar fallback MUY específico
     if (replacementCount === 0) {
       console.log(`⚠️ Usando patrón fallback para ${siteName}`)
       const fallbackMatches = content.match(fallbackPattern)
       if (fallbackMatches) {
         console.log(`📋 Links fallback encontrados:`, fallbackMatches.slice(0, 3))
-        newContent = content.replace(fallbackPattern, newWhatsAppUrl)
+        newContent = newContent.replace(fallbackPattern, newWhatsAppUrl)
         replacementCount = fallbackMatches.length
         totalMatches = fallbackMatches.length
+      }
+    }
+    
+    // Si aún no se encontró nada, buscar SOLO en contextos muy específicos
+    if (replacementCount === 0) {
+      console.log(`🔍 Búsqueda final específica para ${siteName}`)
+      // Solo buscar en líneas que contengan onClick o configuraciones
+      const lines = content.split('\n')
+      let modifiedLines = []
+      let foundLinks = 0
+      
+      for (const line of lines) {
+        if (line.includes('onClick') && line.includes('wa.link') && !line.includes('subtitle') && !line.includes('description')) {
+          const modifiedLine = line.replace(/https:\/\/wa\.link\/[^"'\s)]+/g, newWhatsAppUrl)
+          if (modifiedLine !== line) {
+            foundLinks++
+          }
+          modifiedLines.push(modifiedLine)
+        } else {
+          modifiedLines.push(line)
+        }
+      }
+      
+      if (foundLinks > 0) {
+        newContent = modifiedLines.join('\n')
+        replacementCount = foundLinks
+        console.log(`📋 Links encontrados en líneas específicas: ${foundLinks}`)
       }
     }
     
