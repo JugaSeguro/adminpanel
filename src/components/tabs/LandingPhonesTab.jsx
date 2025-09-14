@@ -43,13 +43,19 @@ const LandingPhonesTab = () => {
   const fetchLandingPhones = async () => {
     try {
       setIsLoading(true)
+      console.log('📥 Cargando números de landing...')
+      
       const { data, error } = await supabase
         .from('landing_phones')
         .select('*')
         .order('landing_number', { ascending: true })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Error cargando datos:', error)
+        throw error
+      }
 
+      console.log(`✅ Cargados ${data?.length || 0} registros:`, data)
       setLandingPhones(data || [])
     } catch (err) {
       console.error('Error cargando números de landing:', err)
@@ -77,11 +83,15 @@ const LandingPhonesTab = () => {
         return
       }
       
+      console.log(`🔄 Actualizando grupo ${group.name} con enlace: ${whatsappLink.trim()}`)
+      
       // Actualizar todos los enlaces del grupo
       const updates = group.landings.map(async (landingNumber) => {
         const autoDescription = description || `${group.name} - Landing ${landingNumber}`
         
-        const { error } = await supabase
+        console.log(`📝 Actualizando Landing ${landingNumber}...`)
+        
+        const { data, error } = await supabase
           .from('landing_phones')
           .update({
             whatsapp_link: whatsappLink.trim(),
@@ -89,19 +99,44 @@ const LandingPhonesTab = () => {
             updated_at: new Date().toISOString()
           })
           .eq('landing_number', landingNumber)
+          .select() // Importante: agregar .select() para obtener los datos actualizados
           
-        if (error) throw error
-        return true
+        if (error) {
+          console.error(`❌ Error actualizando Landing ${landingNumber}:`, error)
+          throw error
+        }
+        
+        console.log(`✅ Landing ${landingNumber} actualizado:`, data)
+        return data
       })
 
-      await Promise.all(updates)
+      const results = await Promise.all(updates)
+      console.log('📊 Resultados de actualización:', results)
+      
+      // Verificar que las actualizaciones se guardaron
+      const updatedCount = results.filter(result => result && result.length > 0).length
+      
+      if (updatedCount === 0) {
+        throw new Error('Las actualizaciones no se guardaron. Posible problema de permisos RLS en Supabase.')
+      }
+      
       await fetchLandingPhones()
       
-      setSuccessMessage(`Grupo ${group.name} actualizado exitosamente (${group.landings.length} landings)`)
+      setSuccessMessage(`Grupo ${group.name} actualizado exitosamente (${updatedCount}/${group.landings.length} landings)`)
       setTimeout(() => setSuccessMessage(''), 3000)
     } catch (err) {
       console.error('Error actualizando grupo:', err)
-      alert('Error al actualizar grupo: ' + err.message)
+      
+      let errorMessage = 'Error al actualizar grupo: ' + err.message
+      
+      // Detectar problemas comunes
+      if (err.message.includes('RLS') || err.message.includes('policy') || err.message.includes('permission')) {
+        errorMessage += '\n\n🔒 Problema de permisos detectado. Soluciones:\n'
+        errorMessage += '1. Ejecuta el script fix-supabase-rls.sql en Supabase\n'
+        errorMessage += '2. O deshabilita RLS temporalmente: ALTER TABLE landing_phones DISABLE ROW LEVEL SECURITY;'
+      }
+      
+      alert(errorMessage)
     } finally {
       setIsUpdating(false)
     }
@@ -249,6 +284,21 @@ const LandingPhonesTab = () => {
               <p className="text-xs">Ejecuta el script SQL para crear la tabla y datos iniciales</p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Diagnóstico de problemas */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <h4 className="font-medium text-yellow-900 mb-2">🔧 Diagnóstico de Problemas</h4>
+        <div className="text-sm text-yellow-800 space-y-2">
+          <p><strong>Si los cambios no se guardan:</strong></p>
+          <ol className="list-decimal list-inside ml-2 space-y-1">
+            <li>Abre la consola del navegador (F12) para ver logs detallados</li>
+            <li>Ve a Supabase Dashboard → SQL Editor</li>
+            <li>Ejecuta: <code className="bg-yellow-100 px-1 rounded">SELECT * FROM pg_policies WHERE tablename = 'landing_phones';</code></li>
+            <li>Si hay políticas RLS, ejecuta: <code className="bg-yellow-100 px-1 rounded">ALTER TABLE public.landing_phones DISABLE ROW LEVEL SECURITY;</code></li>
+          </ol>
+          <p className="mt-2"><strong>Archivo de ayuda:</strong> <code className="bg-yellow-100 px-1 rounded">fix-supabase-rls.sql</code> contiene todos los comandos necesarios.</p>
         </div>
       </div>
 
