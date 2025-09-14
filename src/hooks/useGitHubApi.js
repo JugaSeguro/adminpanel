@@ -9,23 +9,23 @@ import toast from 'react-hot-toast'
 // Configuración de repositorios
 const REPOSITORIES = {
   '1xclub-links-casinos': {
-    owner: 'JugaSeguro', // Cambia por tu usuario de GitHub
-    repo: '1xclub-links-casinos',
+    owner: 'JugaSeguro',
+    repo: 'casino7',
     filePath: 'src/App.jsx'
   },
   '1xclub-links-wsp': {
     owner: 'JugaSeguro',
-    repo: '1xclub-links-wsp', 
+    repo: 'casino8', 
     filePath: 'src/App.jsx'
   },
   '24envivo-links-casinos': {
     owner: 'JugaSeguro',
-    repo: '24envivo-links-casinos',
+    repo: 'casino9',
     filePath: 'src/App.jsx'
   },
   '24envivo-links-wsp': {
     owner: 'JugaSeguro',
-    repo: '24envivo-links-wsp',
+    repo: 'casino10',
     filePath: 'src/App.jsx'
   }
 }
