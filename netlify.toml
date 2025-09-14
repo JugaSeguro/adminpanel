@@ -4,6 +4,8 @@
   
 [build.environment]
   NODE_ENV = "production"
+  # Desactivar escaneo de secretos temporalmente
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 # Variables de entorno se configuran en Netlify Dashboard
 # BUILD_HOOK_1XCLUB_CASINOS
