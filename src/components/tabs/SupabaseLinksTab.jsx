@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { Save, Database, MessageCircle, Link2, Trash2, Plus, RefreshCw, Rocket } from 'lucide-react'
+import { Save, Database, MessageCircle, Link2, Trash2, Plus, RefreshCw, Rocket, Type } from 'lucide-react'
 import { useSupabase } from '../../hooks/useSupabase'
 
 const SupabaseLinksTab = () => {
   const { isLoading, error, supabase } = useSupabase()
   const [globalLinks, setGlobalLinks] = useState(null)
   const [formData, setFormData] = useState({
-    whatsapp_link: ''
+    whatsapp_link: '',
+    register_title: ''
   })
   const [isUpdating, setIsUpdating] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
@@ -29,7 +30,8 @@ const SupabaseLinksTab = () => {
       if (data) {
         setGlobalLinks(data)
         setFormData({
-          whatsapp_link: data.whatsapp_link || ''
+          whatsapp_link: data.whatsapp_link || '',
+          register_title: data.register_title || 'Registrate gratis y pedi 2000 fichas para probar'
         })
       }
     } catch (err) {
@@ -46,8 +48,8 @@ const SupabaseLinksTab = () => {
     setIsUpdating(true)
     setDeploymentStatus('')
     
-    if (!formData.whatsapp_link) {
-      alert('Por favor completa el enlace de WhatsApp')
+    if (!formData.whatsapp_link || !formData.register_title) {
+      alert('Por favor completa todos los campos requeridos')
       setIsUpdating(false)
       return
     }
@@ -59,6 +61,7 @@ const SupabaseLinksTab = () => {
         .upsert({
           id: globalLinks?.id || undefined,
           whatsapp_link: formData.whatsapp_link,
+          register_title: formData.register_title,
           updated_at: new Date().toISOString()
         })
         .select()
@@ -180,6 +183,22 @@ const SupabaseLinksTab = () => {
                 value={formData.whatsapp_link}
                 onChange={(e) => setFormData({ ...formData, whatsapp_link: e.target.value })}
                 placeholder="https://wa.link/iqlqj4"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+            
+            {/* Título de Registro */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                <Type className="inline w-4 h-4 mr-1" />
+                Título de Registro *
+              </label>
+              <input
+                type="text"
+                value={formData.register_title}
+                onChange={(e) => setFormData({ ...formData, register_title: e.target.value })}
+                placeholder="Registrate gratis y pedi 2000 fichas para probar"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
