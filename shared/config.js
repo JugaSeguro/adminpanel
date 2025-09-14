@@ -59,17 +59,5 @@ const SITE_CONFIG = {
           "chatText": "Chatear con nosotros"
         }
       }
-    },
-    "texts": {
-      "mainTitle": "Registrate gratis y pedi 2000 fichas para probar",
-      "subtitle": "Crea tu cuenta rápido y seguro ✨",
-      "description": "Regístrate totalmente gratis en la plataforma más segura de Argentina. Contamos con más de 12000 Slots, la mejor deportiva y el mejor casino en vivo.",
-      "buttons": {
-        "bonus": "🔥 ¡OBTENÉ TU MEGABONUS CON TU PRIMER RECARGA 🔥",
-        "register": "¡REGISTRATE AHORA!",
-        "access": "🎯 ACCEDER A {BRAND} 🎯",
-        "chat": "Chatear con nosotros"
-      },
-      "telegram": "📱 SEGUINOS EN TELEGRAM Y GANÁ PREMIOS DIARIOS 📱"
     }
   };
