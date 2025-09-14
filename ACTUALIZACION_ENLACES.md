@@ -1,5 +1,40 @@
 # Actualización del Sistema de Enlaces
 
+## Corrección de Enlaces 1-6
+
+Se ha identificado y corregido un problema con los enlaces 1-6 que no actualizaban correctamente el título ni el link. El problema estaba en la asignación incorrecta de los sitios para los enlaces 5-6.
+
+### Problema Identificado
+
+Los enlaces 7-10 funcionaban correctamente porque tenían la asignación correcta de sitios:
+- Enlaces 7-8: Correctamente asignados a 1xclub-links-casinos y 1xclub-links-wsp
+- Enlaces 9-10: Correctamente asignados a 24envivo-links-casinos y 24envivo-links-wsp
+
+Sin embargo, los enlaces 5-6 estaban incorrectamente asignados:
+- Enlace 5: Incorrectamente asignado a 1xclub-links-casinos (debería ser 24envivo-links-casinos)
+- Enlace 6: Incorrectamente asignado a 1xclub-links-wsp (debería ser 24envivo-links-wsp)
+
+### Solución Implementada
+
+Se ha corregido la asignación de sitios para los enlaces 5-6 en la función `triggerDeploymentToAllSites` del archivo `SupabaseLinksTab.jsx`:
+
+```javascript
+const sites = [
+  { name: '1xclub-links-casinos', subdomain: '1.registrogratis.online' },
+  { name: '1xclub-links-wsp', subdomain: '2.registrogratis.online' },
+  { name: '24envivo-links-casinos', subdomain: '3.registrogratis.online' },
+  { name: '24envivo-links-wsp', subdomain: '4.registrogratis.online' },
+  { name: '24envivo-links-casinos', subdomain: '5.registrogratis.online' }, // Corregido
+  { name: '24envivo-links-wsp', subdomain: '6.registrogratis.online' }, // Corregido
+  { name: '1xclub-links-casinos', subdomain: '7.registrogratis.online' },
+  { name: '1xclub-links-wsp', subdomain: '8.registrogratis.online' },
+  { name: '24envivo-links-casinos', subdomain: '9.registrogratis.online' },
+  { name: '24envivo-links-wsp', subdomain: '10.registrogratis.online' }
+]
+```
+
+Con esta corrección, todos los enlaces (1-10) ahora deberían actualizar correctamente tanto el título como el link cuando se realiza un despliegue.
+
 ## Problema Resuelto
 
 Se ha solucionado el problema con los enlaces 1-6 que no actualizaban el título ni el link de WhatsApp cuando se realizaban cambios en el panel de administración.
