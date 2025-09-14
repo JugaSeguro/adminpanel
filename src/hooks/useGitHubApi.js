@@ -6,27 +6,31 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
-// Configuración de repositorios
+// Configuración de repositorios con tipos de estructura
 const REPOSITORIES = {
   '1xclub-links-casinos': {
     owner: 'JugaSeguro',
     repo: 'casino7',
-    filePath: 'src/App.jsx'
+    filePath: 'src/App.jsx',
+    type: 'casinos'  // Estructura compleja
   },
   '1xclub-links-wsp': {
     owner: 'JugaSeguro',
     repo: 'casino8', 
-    filePath: 'src/App.jsx'
+    filePath: 'src/App.jsx',
+    type: 'wsp'      // Estructura simple
   },
   '24envivo-links-casinos': {
     owner: 'JugaSeguro',
     repo: 'casino9',
-    filePath: 'src/App.jsx'
+    filePath: 'src/App.jsx',
+    type: 'casinos'  // Estructura compleja
   },
   '24envivo-links-wsp': {
     owner: 'JugaSeguro',
     repo: 'casino10',
-    filePath: 'src/App.jsx'
+    filePath: 'src/App.jsx',
+    type: 'wsp'      // Estructura simple
   }
 }
 
@@ -133,37 +137,33 @@ export const updateTextInFile = async (siteName, textType, newText) => {
     const fileData = await readRepositoryFile(siteName)
     let content = fileData.content
     
-    // Patrones de búsqueda y reemplazo según el tipo de texto
+    // Obtener tipo de estructura del repositorio
+    const repoInfo = REPOSITORIES[siteName]
+    const structureType = repoInfo?.type || 'wsp'
+    
+    // Patrones según el tipo de estructura
     const patterns = {
       mainTitle: {
-        '1xclub-links-casinos': /<h1[^>]*>.*?<\/h1>/g,
-        '1xclub-links-wsp': /<h1[^>]*>.*?<\/h1>/g,
-        '24envivo-links-casinos': /{currentConfig\.texts\?\.mainTitle \|\| ".*?"}/g,
-        '24envivo-links-wsp': /<h1[^>]*>.*?<\/h1>/g
+        'casinos': /{currentConfig\.texts\?\.mainTitle \|\| ".*?"}/g,  // Estructura compleja con configuración dinámica
+        'wsp': /<h1[^>]*>.*?<\/h1>/g  // Estructura simple con HTML directo
       },
       subtitle: {
-        '1xclub-links-casinos': /<p[^>]*>Crea tu cuenta rápido y seguro ✨<\/p>/g,
-        '1xclub-links-wsp': /<p[^>]*>Crea tu cuenta rápido y seguro ✨<\/p>/g,
-        '24envivo-links-casinos': /{currentConfig\.texts\?\.subtitle \|\| ".*?"}/g,
-        '24envivo-links-wsp': /<p[^>]*>Crea tu cuenta rápido y seguro ✨<\/p>/g
+        'casinos': /{currentConfig\.texts\?\.subtitle \|\| ".*?"}/g,   // Estructura compleja
+        'wsp': /<p[^>]*>Crea tu cuenta rápido y seguro ✨<\/p>/g  // Estructura simple
       },
       whatsappUrl: {
-        '1xclub-links-casinos': /https:\/\/wa\.link\/[^"'\s]+/g,
-        '1xclub-links-wsp': /https:\/\/wa\.link\/[^"'\s]+/g,
-        '24envivo-links-casinos': /https:\/\/wa\.link\/[^"'\s]+/g,
-        '24envivo-links-wsp': /https:\/\/wa\.link\/[^"'\s]+/g
+        'casinos': /https:\/\/wa\.link\/[^"'\s]+/g,  // Ambos tipos usan el mismo patrón
+        'wsp': /https:\/\/wa\.link\/[^"'\s]+/g
       },
       telegramUrl: {
-        '1xclub-links-casinos': /https:\/\/t\.me\/[^"'\s]+/g,
-        '1xclub-links-wsp': /https:\/\/t\.me\/[^"'\s]+/g,
-        '24envivo-links-casinos': /https:\/\/t\.me\/[^"'\s]+/g,
-        '24envivo-links-wsp': /https:\/\/t\.me\/[^"'\s]+/g
+        'casinos': /https:\/\/t\.me\/[^"'\s]+/g,  // Ambos tipos usan el mismo patrón
+        'wsp': /https:\/\/t\.me\/[^"'\s]+/g
       }
     }
     
-    const pattern = patterns[textType]?.[siteName]
+    const pattern = patterns[textType]?.[structureType]
     if (!pattern) {
-      throw new Error(`Tipo de texto no soportado: ${textType}`)
+      throw new Error(`Tipo de texto no soportado: ${textType} para estructura ${structureType}`)
     }
     
     // Realizar el reemplazo
