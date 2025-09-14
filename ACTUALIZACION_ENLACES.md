@@ -109,3 +109,61 @@ La asignación de enlaces a los repositorios es la siguiente:
 4. Dale un nombre descriptivo y selecciona los permisos necesarios (al menos necesitas permisos para desplegar sitios).
 5. Haz clic en "Generate token" y copia el token generado.
 6. Pega el token en la variable de entorno `VITE_DEPLOY_TOKEN` en el archivo `.env`.
+
+## Configuración de Variables de Entorno de Supabase en Netlify
+
+Para que los sitios del 1 al 6 funcionen correctamente con Supabase, es necesario configurar las siguientes variables de entorno en cada sitio de Netlify:
+
+### Variables Requeridas
+
+- **VITE_SUPABASE_ANON_KEY**: Clave anónima de Supabase
+- **VITE_SUPABASE_URL**: URL de tu proyecto de Supabase
+
+### Sitios que Requieren Configuración
+
+Estas variables deben configurarse en los siguientes sitios de Netlify:
+
+1. **1xclub-links-casinos** (subdominios: 1, 5, 7)
+2. **1xclub-links-wsp** (subdominios: 2, 6, 8)
+3. **24envivo-links-casinos** (subdominios: 3, 9)
+4. **24envivo-links-wsp** (subdominios: 4, 10)
+
+### Pasos para Configurar las Variables en Netlify
+
+#### Para VITE_SUPABASE_ANON_KEY:
+
+1. Inicia sesión en tu cuenta de Netlify
+2. Navega al sitio específico (ej: 1xclub-links-casinos)
+3. Ve a **Site settings** > **Environment variables**
+4. Haz clic en **Add a variable**
+5. Configura:
+   - **Key**: `VITE_SUPABASE_ANON_KEY`
+   - **Values**: Pega tu clave anónima de Supabase
+   - **Scopes**: Selecciona "All scopes"
+   - **Deploy contexts**: Selecciona "Same value in all deploy contexts"
+6. Haz clic en **Create variable**
+
+#### Para VITE_SUPABASE_URL:
+
+1. En el mismo sitio, haz clic en **Add a variable** nuevamente
+2. Configura:
+   - **Key**: `VITE_SUPABASE_URL`
+   - **Values**: Pega la URL de tu proyecto de Supabase (ej: `https://tu-proyecto.supabase.co`)
+   - **Scopes**: Selecciona "All scopes"
+   - **Deploy contexts**: Selecciona "Same value in all deploy contexts"
+3. Haz clic en **Create variable**
+
+### Importante
+
+- **Repite este proceso para cada uno de los 6 sitios** (1xclub-links-casinos, 1xclub-links-wsp, 24envivo-links-casinos, 24envivo-links-wsp)
+- Las variables deben tener **exactamente los mismos valores** en todos los sitios
+- Después de configurar las variables, es recomendable hacer un nuevo despliegue del sitio para que los cambios tomen efecto
+
+### Cómo Obtener los Valores de Supabase
+
+1. Inicia sesión en tu cuenta de Supabase
+2. Ve a tu proyecto
+3. Navega a **Settings** > **API**
+4. Copia:
+   - **URL**: Este será tu `VITE_SUPABASE_URL`
+   - **anon public**: Esta será tu `VITE_SUPABASE_ANON_KEY`
