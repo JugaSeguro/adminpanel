@@ -32,12 +32,8 @@ const REPOSITORIES = {
 
 // Función para obtener el token de GitHub desde variables de entorno
 const getGitHubToken = () => {
-  // En desarrollo, usar variable de entorno
-  if (import.meta.env.DEV) {
-    return import.meta.env.VITE_GITHUB_TOKEN
-  }
-  // En producción, usar variable de Netlify
-  return import.meta.env.GITHUB_TOKEN
+  // Siempre usar VITE_GITHUB_TOKEN (funciona en desarrollo y producción)
+  return import.meta.env.VITE_GITHUB_TOKEN
 }
 
 // Cliente para GitHub API
@@ -45,7 +41,7 @@ const githubClient = async (endpoint, options = {}) => {
   const token = getGitHubToken()
   
   if (!token) {
-    throw new Error('GitHub token no configurado. Por favor configura GITHUB_TOKEN en las variables de entorno.')
+    throw new Error('GitHub token no configurado. Por favor configura VITE_GITHUB_TOKEN en las variables de entorno.')
   }
 
   const url = `https://api.github.com${endpoint}`
