@@ -34,14 +34,7 @@
     Access-Control-Allow-Headers = "Content-Type, Authorization"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
 
-# Headers CORS para el archivo de configuración compartido
-[[headers]]
-  for = "/shared/config.js"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Headers = "Content-Type"
-    Access-Control-Allow-Methods = "GET, OPTIONS"
-    Content-Type = "application/javascript"
+# Headers CORS removidos para config.js (archivo eliminado)
 
 # Headers de seguridad para la app
 [[headers]]
