@@ -95,7 +95,11 @@ const SupabaseLinksTab = () => {
       { name: '1xclub-links-wsp', subdomain: '3.registrogratis.online' },
       { name: '1xclub-links-casinos', subdomain: '4.registrogratis.online' },
       { name: '24envivo-links-wsp', subdomain: '5.registrogratis.online' },
-      { name: '24envivo-links-casinos', subdomain: '6.registrogratis.online' }
+      { name: '24envivo-links-casinos', subdomain: '6.registrogratis.online' },
+      { name: '1xclub-links-casinos', subdomain: '7.registrogratis.online' },
+      { name: '1xclub-links-wsp', subdomain: '8.registrogratis.online' },
+      { name: '24envivo-links-casinos', subdomain: '9.registrogratis.online' },
+      { name: '24envivo-links-wsp', subdomain: '10.registrogratis.online' }
     ]
 
     let successCount = 0
