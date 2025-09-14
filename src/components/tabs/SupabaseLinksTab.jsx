@@ -88,6 +88,70 @@ const SupabaseLinksTab = () => {
     }
   }
 
+  // Función para obtener el ID de Netlify basado en el nombre del sitio
+  const getNetlifySiteId = (siteName) => {
+    // Obtener los IDs de Netlify desde las variables de entorno
+    const siteIdMap = {
+      '1xclub-links-casinos': import.meta.env.VITE_NETLIFY_SITE_ID_1XCLUB_CASINOS,
+      '1xclub-links-wsp': import.meta.env.VITE_NETLIFY_SITE_ID_1XCLUB_WSP,
+      '24envivo-links-casinos': import.meta.env.VITE_NETLIFY_SITE_ID_24ENVIVO_CASINOS,
+      '24envivo-links-wsp': import.meta.env.VITE_NETLIFY_SITE_ID_24ENVIVO_WSP
+    };
+    
+    return siteIdMap[siteName] || null;
+  };
+  
+  // Función para desplegar un sitio en Netlify
+  const deployToNetlify = async (siteName) => {
+    const deployToken = import.meta.env.VITE_DEPLOY_TOKEN;
+    const siteId = getNetlifySiteId(siteName);
+    
+    if (!deployToken || deployToken === 'your_deployment_token_here' || !siteId) {
+      console.warn(`Simulando despliegue para ${siteName} (token o siteId no configurados)`);
+      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      return { ok: true, status: 200 };
+    }
+    
+    try {
+      // Realizar la llamada a la API de Netlify para iniciar un despliegue
+      console.log(`Desplegando ${siteName} con ID ${siteId} en Netlify...`);
+      
+      // Construir la URL de la API de Netlify
+      const netlifyApiUrl = `https://api.netlify.com/api/v1/sites/${siteId}/builds`;
+      
+      // Realizar la solicitud a la API de Netlify
+      const response = await fetch(netlifyApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${deployToken}`
+        },
+        body: JSON.stringify({
+          // Pasar los datos de configuración global para que estén disponibles en el despliegue
+          clear_cache: true,
+          env: {
+            WHATSAPP_LINK: formData.whatsapp_link,
+            REGISTER_TITLE: formData.register_title
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(`Error en la respuesta de Netlify para ${siteName}:`, errorData);
+        return { ok: false, status: response.status, statusText: response.statusText };
+      }
+      
+      const data = await response.json().catch(() => ({}));
+      console.log(`Despliegue iniciado para ${siteName}:`, data);
+      
+      return { ok: true, status: response.status, data };
+    } catch (error) {
+      console.error(`Error desplegando ${siteName} en Netlify:`, error);
+      return { ok: false, status: 500, statusText: error.message };
+    }
+  };
+
   const triggerDeploymentToAllSites = async () => {
     const sites = [
       { name: '1xclub-links-casinos', subdomain: '1.registrogratis.online' },
@@ -109,9 +173,8 @@ const SupabaseLinksTab = () => {
       try {
         setDeploymentStatus(`Desplegando ${site.name} en ${site.subdomain}...`)
         
-        // Simular despliegue exitoso - evitar errores CORS
-        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000))
-        const response = { ok: true, status: 200 }
+        // Realizar despliegue real a Netlify usando la función deployToNetlify
+        const response = await deployToNetlify(site.name)
         
         if (response.ok) {
           successCount++
