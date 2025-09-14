@@ -1,31 +1,14 @@
 import React, { Suspense } from 'react'
 import Header from './components/layout/Header'
-import Navigation from './components/layout/Navigation'
 import LoadingOverlay from './components/ui/LoadingOverlay'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 import useAppStore from './store/useStore'
 
-// Lazy loading de tabs para mejor rendimiento
-const ConfigTab = React.lazy(() => import('./components/tabs/ConfigTab'))
-const TextsTab = React.lazy(() => import('./components/tabs/TextsTab'))
-const SitesTab = React.lazy(() => import('./components/tabs/SitesTab'))
-const DeployTab = React.lazy(() => import('./components/tabs/DeployTab'))
+// Solo cargar la pestaña de GitHub
 const GitHubConfigTab = React.lazy(() => import('./components/tabs/GitHubConfigTab'))
 
 function App() {
-  const { activeTab, isLoading } = useAppStore()
-
-  const renderActiveTab = () => {
-    const TabComponent = {
-      config: ConfigTab,
-      texts: TextsTab,
-      sites: SitesTab,
-      deploy: DeployTab,
-      github: GitHubConfigTab
-    }[activeTab]
-
-    return TabComponent ? <TabComponent /> : <ConfigTab />
-  }
+  const { isLoading } = useAppStore()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
@@ -46,7 +29,6 @@ function App() {
       <div className="relative z-10 flex flex-col min-h-screen">
         <ErrorBoundary>
           <Header />
-          <Navigation />
           
           <main className="flex-1 p-3 sm:p-6 animate-fade-in">
             <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-slide-in-left">
@@ -74,7 +56,7 @@ function App() {
                         </div>
                       </div>
                     }>
-                      {renderActiveTab()}
+                      <GitHubConfigTab />
                     </Suspense>
                   </div>
                 </div>

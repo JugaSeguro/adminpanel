@@ -1,55 +1,18 @@
 import React, { useState } from 'react'
-import { Save, Github, RefreshCw, Globe, Link, MessageCircle, Send, Sparkles } from 'lucide-react'
+import { Save, Github, MessageCircle, Link2 } from 'lucide-react'
 import { useGitHubApi } from '../../hooks/useGitHubApi'
 import Button from '../ui/Button'
 
 const GitHubConfigTab = () => {
-  const { updateText, updateAllSites, isLoading, error, repositories } = useGitHubApi()
+  const { updateAllWhatsAppLinks, isLoading, error, repositories } = useGitHubApi()
   
-  const [formData, setFormData] = useState({
-    whatsappUrl: 'https://wa.link/oy1xno',
-    telegramUrl: 'https://t.me/jugadirecto',
-    mainTitle: 'Registrate gratis y pedi 2000 fichas para probar',
-    subtitle: 'Crea tu cuenta rápido y seguro ✨'
-  })
-  
-  const [selectedSites, setSelectedSites] = useState(repositories)
-  const [updateType, setUpdateType] = useState('all') // 'all' o 'selected'
+  const [whatsappUrl, setWhatsappUrl] = useState('https://wa.link/oy1xno')
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
-  }
-
-  const handleSiteToggle = (siteName) => {
-    setSelectedSites(prev => 
-      prev.includes(siteName) 
-        ? prev.filter(site => site !== siteName)
-        : [...prev, siteName]
-    )
-  }
-
-  const handleUpdateTexts = async () => {
+  const handleUpdateWhatsApp = async () => {
     try {
-      if (updateType === 'all') {
-        // Actualizar todos los sitios
-        await updateAllSites('mainTitle', formData.mainTitle)
-        await updateAllSites('subtitle', formData.subtitle)
-        await updateAllSites('whatsappUrl', formData.whatsappUrl)
-        await updateAllSites('telegramUrl', formData.telegramUrl)
-      } else {
-        // Actualizar solo sitios seleccionados
-        for (const siteName of selectedSites) {
-          await updateText(siteName, 'mainTitle', formData.mainTitle)
-          await updateText(siteName, 'subtitle', formData.subtitle)
-          await updateText(siteName, 'whatsappUrl', formData.whatsappUrl)
-          await updateText(siteName, 'telegramUrl', formData.telegramUrl)
-        }
-      }
+      await updateAllWhatsAppLinks(whatsappUrl)
     } catch (error) {
-      console.error('Error updating texts:', error)
+      console.error('Error updating WhatsApp:', error)
     }
   }
 
@@ -63,20 +26,20 @@ const GitHubConfigTab = () => {
   return (
     <div className="space-y-4 md:space-y-8 animate-fade-in p-3 md:p-0">
       {/* Header con gradiente */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl md:rounded-2xl p-4 md:p-8 border border-white/20 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl md:rounded-2xl p-4 md:p-8 border border-white/20 shadow-xl">
         <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
           <div className="flex items-center space-x-3 md:space-x-4">
-            <div className="p-2 md:p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg md:rounded-xl shadow-lg">
-              <Github className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            <div className="p-2 md:p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg md:rounded-xl shadow-lg">
+              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover-scale">
-                <span className="hidden sm:inline">Configuración GitHub</span>
-                <span className="sm:hidden">GitHub Config</span>
+              <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent hover-scale">
+                <span className="hidden sm:inline">Actualizar Links de WhatsApp</span>
+                <span className="sm:hidden">WhatsApp Links</span>
               </h2>
-              <p className="text-blue-200/80 text-xs sm:text-sm font-medium tracking-wide hidden sm:block">
-                Actualización directa vía GitHub API • Control de versiones
+              <p className="text-green-200/80 text-xs sm:text-sm font-medium tracking-wide hidden sm:block">
+                Actualiza el link de WhatsApp en los 4 sitios de casino
               </p>
             </div>
           </div>
@@ -89,142 +52,65 @@ const GitHubConfigTab = () => {
         </div>
         
         {/* Elementos decorativos */}
-        <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl"></div>
-        <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-indigo-400/20 to-pink-400/20 rounded-full blur-xl"></div>
+        <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-full blur-xl"></div>
+        <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-teal-400/20 to-cyan-400/20 rounded-full blur-xl"></div>
       </div>
 
-      {/* Configuración de sitios */}
+      {/* Sitios que se actualizarán */}
       <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
         
         <div className="relative z-10 p-4 md:p-8">
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg">
-              <Globe className="w-5 h-5 text-white" />
+              <Link2 className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-slate-800">Sitios a Actualizar</h3>
+            <h3 className="text-xl font-bold text-slate-800">Sitios que se Actualizarán</h3>
             <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
           </div>
           
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="updateType"
-                  value="all"
-                  checked={updateType === 'all'}
-                  onChange={(e) => setUpdateType(e.target.value)}
-                  className="text-blue-600"
-                />
-                <span className="font-medium">Todos los sitios</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="updateType"
-                  value="selected"
-                  checked={updateType === 'selected'}
-                  onChange={(e) => setUpdateType(e.target.value)}
-                  className="text-blue-600"
-                />
-                <span className="font-medium">Sitios seleccionados</span>
-              </label>
-            </div>
-            
-            {updateType === 'selected' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {repositories.map(siteName => (
-                  <label key={siteName} className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg border border-white/20 hover:bg-white/70 transition-colors cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedSites.includes(siteName)}
-                      onChange={() => handleSiteToggle(siteName)}
-                      className="text-blue-600 rounded"
-                    />
-                    <span className="font-medium text-slate-700">
-                      {siteDisplayNames[siteName] || siteName}
-                    </span>
-                  </label>
-                ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {repositories.map(siteName => (
+              <div key={siteName} className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg border border-white/20">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="font-medium text-slate-700">
+                  {siteDisplayNames[siteName] || siteName}
+                </span>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Formulario de configuración */}
+      {/* Formulario de WhatsApp */}
       <div className="relative bg-white/70 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-white/30"></div>
         
         <div className="relative z-10 p-4 md:p-8">
           <div className="flex items-center space-x-3 mb-8">
             <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg">
-              <Link className="w-5 h-5 text-white" />
+              <MessageCircle className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-slate-800">Configuración de Contenido</h3>
+            <h3 className="text-xl font-bold text-slate-800">Nuevo Link de WhatsApp</h3>
             <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
-            {/* Título Principal */}
-            <div className="group">
-              <label className="flex items-center space-x-2 text-sm font-semibold text-slate-700 mb-3">
-                <Sparkles className="w-4 h-4 text-blue-600" />
-                <span>Título Principal</span>
-              </label>
-              <input
-                type="text"
-                value={formData.mainTitle}
-                onChange={(e) => handleInputChange('mainTitle', e.target.value)}
-                placeholder="Registrate gratis y pedi 2000 fichas para probar"
-                className="w-full px-3 md:px-4 py-3 md:py-4 bg-white/80 border-2 rounded-lg md:rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 group-hover:bg-white/90 text-sm md:text-base border-blue-200"
-              />
-            </div>
-            
-            {/* Subtítulo */}
-            <div className="group">
-              <label className="flex items-center space-x-2 text-sm font-semibold text-slate-700 mb-3">
-                <Sparkles className="w-4 h-4 text-purple-600" />
-                <span>Subtítulo</span>
-              </label>
-              <input
-                type="text"
-                value={formData.subtitle}
-                onChange={(e) => handleInputChange('subtitle', e.target.value)}
-                placeholder="Crea tu cuenta rápido y seguro ✨"
-                className="w-full px-3 md:px-4 py-3 md:py-4 bg-white/80 border-2 rounded-lg md:rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 group-hover:bg-white/90 text-sm md:text-base border-purple-200"
-              />
-            </div>
-            
-            {/* WhatsApp URL */}
+          <div className="max-w-2xl">
             <div className="group">
               <label className="flex items-center space-x-2 text-sm font-semibold text-slate-700 mb-3">
                 <MessageCircle className="w-4 h-4 text-green-600" />
-                <span>WhatsApp URL</span>
+                <span>URL de WhatsApp</span>
               </label>
               <input
                 type="url"
-                value={formData.whatsappUrl}
-                onChange={(e) => handleInputChange('whatsappUrl', e.target.value)}
+                value={whatsappUrl}
+                onChange={(e) => setWhatsappUrl(e.target.value)}
                 placeholder="https://wa.link/oy1xno"
-                className="w-full px-3 md:px-4 py-3 md:py-4 bg-white/80 border-2 rounded-lg md:rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 group-hover:bg-white/90 text-sm md:text-base border-green-200"
+                className="w-full px-4 py-4 bg-white/80 border-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 group-hover:bg-white/90 text-base border-green-200"
               />
-            </div>
-            
-            {/* Telegram URL */}
-            <div className="group">
-              <label className="flex items-center space-x-2 text-sm font-semibold text-slate-700 mb-3">
-                <Send className="w-4 h-4 text-blue-600" />
-                <span>Telegram URL</span>
-              </label>
-              <input
-                type="url"
-                value={formData.telegramUrl}
-                onChange={(e) => handleInputChange('telegramUrl', e.target.value)}
-                placeholder="https://t.me/jugadirecto"
-                className="w-full px-3 md:px-4 py-3 md:py-4 bg-white/80 border-2 rounded-lg md:rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 group-hover:bg-white/90 text-sm md:text-base border-blue-200"
-              />
+              <p className="text-sm text-slate-500 mt-2">
+                Este link se actualizará en todos los botones de WhatsApp de los 4 sitios
+              </p>
             </div>
           </div>
         </div>
@@ -241,9 +127,9 @@ const GitHubConfigTab = () => {
                 <Save className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-800">Actualizar vía GitHub</h4>
+                <h4 className="font-semibold text-slate-800">Actualizar en GitHub</h4>
                 <p className="text-sm text-slate-600">
-                  Los cambios se aplicarán directamente a los archivos fuente
+                  Se actualizarán todos los links de WhatsApp en los 4 sitios
                 </p>
               </div>
             </div>
@@ -258,13 +144,13 @@ const GitHubConfigTab = () => {
               <Button
                 variant="primary"
                 size="lg"
-                onClick={handleUpdateTexts}
+                onClick={handleUpdateWhatsApp}
                 isLoading={isLoading}
                 loadingText="Actualizando..."
                 icon={<Github className="w-5 h-5" />}
                 className="text-sm md:text-base font-semibold relative overflow-hidden"
               >
-                Actualizar en GitHub
+                Actualizar WhatsApp
               </Button>
             </div>
           </div>

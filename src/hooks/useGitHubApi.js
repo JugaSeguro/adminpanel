@@ -159,153 +159,60 @@ export const updateRepositoryFile = async (siteName, newContent, commitMessage, 
   throw lastError
 }
 
-// Función para actualizar texto específico en un archivo
-export   const updateTextInFile = async (siteName, textType, newText) => {
+// Función para actualizar SOLO links de WhatsApp en un archivo
+export const updateWhatsAppLink = async (siteName, newWhatsAppUrl) => {
   try {
     // Leer el archivo actual
     const fileData = await readRepositoryFile(siteName)
     let content = fileData.content
     
-    // DEBUG: Mostrar contenido del archivo para diagnóstico
-    console.log(`📁 Contenido de ${siteName} (primeras 500 caracteres):`)
-    console.log(content.substring(0, 500))
-    console.log('--- FIN PREVIEW ---')
+    console.log(`📁 Actualizando WhatsApp en ${siteName}`)
     
     // Obtener tipo de estructura del repositorio
     const repoInfo = REPOSITORIES[siteName]
     const structureType = repoInfo?.type || 'wsp'
     
-    // Patrones según el tipo de estructura
-    const patterns = {
-      mainTitle: {
-        'casinos': /{currentConfig\.texts\?\.mainTitle \|\| ".*?"}/g,  // Estructura compleja con configuración dinámica
-        'wsp': /<h1[^>]*>.*?<\/h1>/g  // Estructura simple con HTML directo
-      },
-      subtitle: {
-        'casinos': /{currentConfig\.texts\?\.subtitle \|\| ".*?"}/g,   // Estructura compleja
-        'wsp': /<p[^>]*>.*?<\/p>/g  // Patrón más flexible para subtítulos
-      },
-      whatsappUrl: {
-        'casinos': /https:\/\/wa\.link\/[^"'\s]+/g,  // Ambos tipos usan el mismo patrón
-        'wsp': /https:\/\/wa\.link\/[^"'\s]+/g
-      },
-      telegramUrl: {
-        'casinos': /https:\/\/t\.me\/[^"'\s]+/g,  // Ambos tipos usan el mismo patrón
-        'wsp': /https:\/\/t\.me\/[^"'\s]+/g
-      }
-    }
+    // Patrón para encontrar links de WhatsApp
+    const whatsappPattern = /https:\/\/wa\.link\/[^"'\s]+/g
     
-    const pattern = patterns[textType]?.[structureType]
-    if (!pattern) {
-      throw new Error(`Tipo de texto no soportado: ${textType} para estructura ${structureType}`)
-    }
-    
-    // DEBUG: Mostrar patrón que se va a usar
-    console.log(`🔍 Buscando patrón para ${textType} en estructura ${structureType}:`, pattern)
-    
-    // DEBUG: Probar si el patrón encuentra algo
-    const matches = content.match(pattern)
-    console.log(`🎯 Coincidencias encontradas:`, matches ? matches.length : 0)
+    // DEBUG: Mostrar coincidencias encontradas
+    const matches = content.match(whatsappPattern)
+    console.log(`🎯 Links de WhatsApp encontrados en ${siteName}:`, matches ? matches.length : 0)
     if (matches) {
-      console.log(`📋 Primeras coincidencias:`, matches.slice(0, 3))
+      console.log(`📋 Links actuales:`, matches.slice(0, 3))
     }
     
-    // Realizar el reemplazo según el tipo de estructura
-    let newContent
-    if (textType === 'mainTitle') {
-      if (structureType === 'casinos') {
-        newContent = content.replace(pattern, `{currentConfig.texts?.mainTitle || "${newText}"}`)
-      } else {
-        // Para wsp, mantener las clases CSS existentes si las hay
-        const match = content.match(pattern)
-        if (match && match[0]) {
-          const existingH1 = match[0]
-          const hasClass = existingH1.includes('class=')
-          if (hasClass) {
-            // Extraer las clases existentes
-            const classMatch = existingH1.match(/class="([^"]*)"/)
-            const classes = classMatch ? classMatch[1] : ''
-            newContent = content.replace(pattern, `<h1 class="${classes}">${newText}</h1>`)
-          } else {
-            newContent = content.replace(pattern, `<h1>${newText}</h1>`)
-          }
-        } else {
-          newContent = content.replace(pattern, `<h1>${newText}</h1>`)
-        }
-      }
-    } else if (textType === 'subtitle') {
-      if (structureType === 'casinos') {
-        newContent = content.replace(pattern, `{currentConfig.texts?.subtitle || "${newText}"}`)
-      } else {
-        // Para wsp, mantener las clases CSS existentes si las hay
-        const match = content.match(pattern)
-        if (match && match[0]) {
-          const existingP = match[0]
-          const hasClass = existingP.includes('class=')
-          if (hasClass) {
-            // Extraer las clases existentes
-            const classMatch = existingP.match(/class="([^"]*)"/)
-            const classes = classMatch ? classMatch[1] : ''
-            newContent = content.replace(pattern, `<p class="${classes}">${newText}</p>`)
-          } else {
-            newContent = content.replace(pattern, `<p>${newText}</p>`)
-          }
-        } else {
-          newContent = content.replace(pattern, `<p>${newText}</p>`)
-        }
-      }
-    } else if (textType === 'whatsappUrl') {
-      newContent = content.replace(pattern, newText)
-    } else if (textType === 'telegramUrl') {
-      newContent = content.replace(pattern, newText)
-    }
+    // Reemplazar TODOS los links de WhatsApp encontrados
+    const newContent = content.replace(whatsappPattern, newWhatsAppUrl)
     
     if (!newContent || newContent === content) {
-      throw new Error(`No se encontró el patrón para actualizar ${textType} en ${siteName}`)
+      throw new Error(`No se encontraron links de WhatsApp para actualizar en ${siteName}`)
     }
     
     // Actualizar el archivo
-    const commitMessage = `Actualizar ${textType} en ${siteName}: ${newText.substring(0, 50)}...`
+    const commitMessage = `Actualizar link de WhatsApp en ${siteName}: ${newWhatsAppUrl}`
     await updateRepositoryFile(siteName, newContent, commitMessage)
     
     return {
       success: true,
-      message: `${textType} actualizado correctamente en ${siteName}`,
+      message: `WhatsApp actualizado correctamente en ${siteName}`,
       siteName,
-      textType,
-      newText
+      newWhatsAppUrl,
+      matchesCount: matches ? matches.length : 0
     }
     
   } catch (error) {
-    console.error(`Error actualizando ${textType} en ${siteName}:`, error)
+    console.error(`Error actualizando WhatsApp en ${siteName}:`, error)
     throw error
   }
 }
 
-// Hook para usar las funciones de GitHub
+// Hook simplificado para actualizar SOLO links de WhatsApp
 export const useGitHubApi = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const updateText = async (siteName, textType, newText) => {
-    setIsLoading(true)
-    setError(null)
-    
-    try {
-      const result = await updateTextInFile(siteName, textType, newText)
-      toast.success(result.message)
-      return result
-    } catch (err) {
-      const errorMessage = `Error actualizando ${textType} en ${siteName}: ${err.message}`
-      setError(errorMessage)
-      toast.error(errorMessage)
-      throw err
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const updateAllSites = async (textType, newText) => {
+  const updateAllWhatsAppLinks = async (newWhatsAppUrl) => {
     setIsLoading(true)
     setError(null)
     
@@ -313,7 +220,8 @@ export const useGitHubApi = () => {
     const errors = []
     const siteNames = Object.keys(REPOSITORIES)
     
-    console.log(`🚀 Iniciando actualización de ${textType} en ${siteNames.length} sitios...`)
+    console.log(`🚀 Iniciando actualización de WhatsApp en ${siteNames.length} sitios...`)
+    console.log(`🔗 Nuevo link: ${newWhatsAppUrl}`)
     
     // Procesar sitios de manera secuencial para evitar conflictos de concurrencia
     for (let i = 0; i < siteNames.length; i++) {
@@ -321,9 +229,9 @@ export const useGitHubApi = () => {
       console.log(`📝 Procesando sitio ${i + 1}/${siteNames.length}: ${siteName}`)
       
       try {
-        const result = await updateTextInFile(siteName, textType, newText)
+        const result = await updateWhatsAppLink(siteName, newWhatsAppUrl)
         results.push(result)
-        console.log(`✅ ${siteName}: Actualizado exitosamente`)
+        console.log(`✅ ${siteName}: ${result.matchesCount} links actualizados`)
       } catch (err) {
         const errorInfo = { siteName, error: err.message }
         errors.push(errorInfo)
@@ -344,25 +252,25 @@ export const useGitHubApi = () => {
     // Resumen final
     const successCount = results.length
     const errorCount = errors.length
+    const totalLinksUpdated = results.reduce((sum, result) => sum + result.matchesCount, 0)
     
     if (errorCount > 0) {
       const errorMessage = `Completado con errores: ${successCount} exitosos, ${errorCount} fallidos`
       setError(errorMessage)
       
       if (successCount > 0) {
-        toast.success(`${successCount} sitios actualizados correctamente`, { duration: 3000 })
+        toast.success(`${successCount} sitios actualizados (${totalLinksUpdated} links)`, { duration: 3000 })
       }
     } else {
-      toast.success(`🎉 Actualizado correctamente en todos los ${successCount} sitios`)
+      toast.success(`🎉 Actualizado correctamente: ${totalLinksUpdated} links en ${successCount} sitios`)
     }
     
-    console.log(`📊 Resumen: ${successCount} exitosos, ${errorCount} errores`)
-    return { results, errors }
+    console.log(`📊 Resumen: ${successCount} sitios exitosos, ${errorCount} errores, ${totalLinksUpdated} links actualizados`)
+    return { results, errors, totalLinksUpdated }
   }
 
   return {
-    updateText,
-    updateAllSites,
+    updateAllWhatsAppLinks,
     isLoading,
     error,
     repositories: Object.keys(REPOSITORIES)
