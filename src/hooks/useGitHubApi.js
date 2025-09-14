@@ -131,11 +131,16 @@ export const updateRepositoryFile = async (siteName, newContent, commitMessage) 
 }
 
 // Función para actualizar texto específico en un archivo
-export const updateTextInFile = async (siteName, textType, newText) => {
+export   const updateTextInFile = async (siteName, textType, newText) => {
   try {
     // Leer el archivo actual
     const fileData = await readRepositoryFile(siteName)
     let content = fileData.content
+    
+    // DEBUG: Mostrar contenido del archivo para diagnóstico
+    console.log(`📁 Contenido de ${siteName} (primeras 500 caracteres):`)
+    console.log(content.substring(0, 500))
+    console.log('--- FIN PREVIEW ---')
     
     // Obtener tipo de estructura del repositorio
     const repoInfo = REPOSITORIES[siteName]
@@ -164,6 +169,16 @@ export const updateTextInFile = async (siteName, textType, newText) => {
     const pattern = patterns[textType]?.[structureType]
     if (!pattern) {
       throw new Error(`Tipo de texto no soportado: ${textType} para estructura ${structureType}`)
+    }
+    
+    // DEBUG: Mostrar patrón que se va a usar
+    console.log(`🔍 Buscando patrón para ${textType} en estructura ${structureType}:`, pattern)
+    
+    // DEBUG: Probar si el patrón encuentra algo
+    const matches = content.match(pattern)
+    console.log(`🎯 Coincidencias encontradas:`, matches ? matches.length : 0)
+    if (matches) {
+      console.log(`📋 Primeras coincidencias:`, matches.slice(0, 3))
     }
     
     // Realizar el reemplazo
