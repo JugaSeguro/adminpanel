@@ -74,6 +74,17 @@ VITE_NETLIFY_SITE_ID_24ENVIVO_CASINOS=your_24envivo_casinos_site_id_here
 VITE_NETLIFY_SITE_ID_24ENVIVO_WSP=your_24envivo_wsp_site_id_here
 ```
 
+### Importante: Mensajes de Simulación
+
+Si ves mensajes como `Simulando despliegue para [sitio] (token o siteId no configurados)` en la consola, esto indica que:
+
+1. No has configurado el token de despliegue (`VITE_DEPLOY_TOKEN`) con un valor válido, o
+2. No has configurado los IDs de los sitios de Netlify con valores válidos
+
+Esto es normal si estás en un entorno de desarrollo y no has configurado estas variables. El sistema simulará los despliegues en lugar de realizarlos realmente.
+
+Para realizar despliegues reales, asegúrate de reemplazar los valores de placeholder en el archivo `.env` con los valores reales obtenidos de Netlify.
+
 ## Asignación de Enlaces
 
 La asignación de enlaces a los repositorios es la siguiente:
