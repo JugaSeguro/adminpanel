@@ -106,37 +106,57 @@ export const readRepositoryFile = async (siteName) => {
   }
 }
 
-// Función para actualizar un archivo en un repositorio
-export const updateRepositoryFile = async (siteName, newContent, commitMessage) => {
+// Función para actualizar un archivo en un repositorio con reintentos automáticos
+export const updateRepositoryFile = async (siteName, newContent, commitMessage, maxRetries = 3) => {
   const repo = REPOSITORIES[siteName]
   if (!repo) {
     throw new Error(`Repositorio no encontrado para ${siteName}`)
   }
 
-  try {
-    // Primero leer el archivo para obtener el SHA
-    const fileData = await readRepositoryFile(siteName)
-    
-    // Codificar el contenido correctamente en UTF-8 y luego Base64
-    const encoder = new TextEncoder()
-    const utf8Bytes = encoder.encode(newContent)
-    const encodedContent = btoa(String.fromCharCode(...utf8Bytes))
-    
-    // Actualizar el archivo
-    const updateData = await githubClient(`/repos/${repo.owner}/${repo.repo}/contents/${repo.filePath}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: commitMessage,
-        content: encodedContent,
-        sha: fileData.sha
+  let lastError = null
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // Leer el archivo actual para obtener el SHA más reciente
+      const fileData = await readRepositoryFile(siteName)
+      
+      // Codificar el contenido correctamente en UTF-8 y luego Base64
+      const encoder = new TextEncoder()
+      const utf8Bytes = encoder.encode(newContent)
+      const encodedContent = btoa(String.fromCharCode(...utf8Bytes))
+      
+      console.log(`🔄 Intento ${attempt}/${maxRetries} actualizando ${siteName} con SHA: ${fileData.sha.substring(0, 8)}...`)
+      
+      // Actualizar el archivo
+      const updateData = await githubClient(`/repos/${repo.owner}/${repo.repo}/contents/${repo.filePath}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          message: commitMessage,
+          content: encodedContent,
+          sha: fileData.sha
+        })
       })
-    })
-    
-    return updateData
-  } catch (error) {
-    console.error(`Error actualizando archivo de ${siteName}:`, error)
-    throw error
+      
+      console.log(`✅ Archivo actualizado exitosamente en ${siteName}`)
+      return updateData
+      
+    } catch (error) {
+      lastError = error
+      console.warn(`⚠️ Intento ${attempt} falló para ${siteName}:`, error.message)
+      
+      // Si es un error de SHA mismatch y no es el último intento, esperar un poco y reintentar
+      if (error.message.includes('does not match') && attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000) // Backoff exponencial
+        console.log(`⏳ Esperando ${delay}ms antes del siguiente intento...`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+      } else {
+        break // No reintentar para otros tipos de errores
+      }
+    }
   }
+  
+  console.error(`❌ Error actualizando archivo de ${siteName} después de ${maxRetries} intentos:`, lastError)
+  throw lastError
 }
 
 // Función para actualizar texto específico en un archivo
@@ -163,7 +183,7 @@ export   const updateTextInFile = async (siteName, textType, newText) => {
       },
       subtitle: {
         'casinos': /{currentConfig\.texts\?\.subtitle \|\| ".*?"}/g,   // Estructura compleja
-        'wsp': /<p[^>]*>Crea tu cuenta rápido y seguro ✨<\/p>/g  // Estructura simple
+        'wsp': /<p[^>]*>.*?<\/p>/g  // Patrón más flexible para subtítulos
       },
       whatsappUrl: {
         'casinos': /https:\/\/wa\.link\/[^"'\s]+/g,  // Ambos tipos usan el mismo patrón
@@ -190,19 +210,49 @@ export   const updateTextInFile = async (siteName, textType, newText) => {
       console.log(`📋 Primeras coincidencias:`, matches.slice(0, 3))
     }
     
-    // Realizar el reemplazo
+    // Realizar el reemplazo según el tipo de estructura
     let newContent
     if (textType === 'mainTitle') {
-      if (siteName === '24envivo-links-casinos') {
+      if (structureType === 'casinos') {
         newContent = content.replace(pattern, `{currentConfig.texts?.mainTitle || "${newText}"}`)
       } else {
-        newContent = content.replace(pattern, `<h1>${newText}</h1>`)
+        // Para wsp, mantener las clases CSS existentes si las hay
+        const match = content.match(pattern)
+        if (match && match[0]) {
+          const existingH1 = match[0]
+          const hasClass = existingH1.includes('class=')
+          if (hasClass) {
+            // Extraer las clases existentes
+            const classMatch = existingH1.match(/class="([^"]*)"/)
+            const classes = classMatch ? classMatch[1] : ''
+            newContent = content.replace(pattern, `<h1 class="${classes}">${newText}</h1>`)
+          } else {
+            newContent = content.replace(pattern, `<h1>${newText}</h1>`)
+          }
+        } else {
+          newContent = content.replace(pattern, `<h1>${newText}</h1>`)
+        }
       }
     } else if (textType === 'subtitle') {
-      if (siteName === '24envivo-links-casinos') {
+      if (structureType === 'casinos') {
         newContent = content.replace(pattern, `{currentConfig.texts?.subtitle || "${newText}"}`)
       } else {
-        newContent = content.replace(pattern, `<p>${newText}</p>`)
+        // Para wsp, mantener las clases CSS existentes si las hay
+        const match = content.match(pattern)
+        if (match && match[0]) {
+          const existingP = match[0]
+          const hasClass = existingP.includes('class=')
+          if (hasClass) {
+            // Extraer las clases existentes
+            const classMatch = existingP.match(/class="([^"]*)"/)
+            const classes = classMatch ? classMatch[1] : ''
+            newContent = content.replace(pattern, `<p class="${classes}">${newText}</p>`)
+          } else {
+            newContent = content.replace(pattern, `<p>${newText}</p>`)
+          }
+        } else {
+          newContent = content.replace(pattern, `<p>${newText}</p>`)
+        }
       }
     } else if (textType === 'whatsappUrl') {
       newContent = content.replace(pattern, newText)
@@ -261,26 +311,52 @@ export const useGitHubApi = () => {
     
     const results = []
     const errors = []
+    const siteNames = Object.keys(REPOSITORIES)
     
-    for (const siteName of Object.keys(REPOSITORIES)) {
+    console.log(`🚀 Iniciando actualización de ${textType} en ${siteNames.length} sitios...`)
+    
+    // Procesar sitios de manera secuencial para evitar conflictos de concurrencia
+    for (let i = 0; i < siteNames.length; i++) {
+      const siteName = siteNames[i]
+      console.log(`📝 Procesando sitio ${i + 1}/${siteNames.length}: ${siteName}`)
+      
       try {
         const result = await updateTextInFile(siteName, textType, newText)
         results.push(result)
+        console.log(`✅ ${siteName}: Actualizado exitosamente`)
       } catch (err) {
-        errors.push({ siteName, error: err.message })
+        const errorInfo = { siteName, error: err.message }
+        errors.push(errorInfo)
+        console.error(`❌ ${siteName}: ${err.message}`)
+        
+        // Mostrar toast individual para cada error
+        toast.error(`${siteName}: ${err.message}`, { duration: 4000 })
+      }
+      
+      // Pequeña pausa entre sitios para reducir la carga en GitHub API
+      if (i < siteNames.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
     
     setIsLoading(false)
     
-    if (errors.length > 0) {
-      const errorMessage = `Errores en ${errors.length} sitios: ${errors.map(e => e.siteName).join(', ')}`
+    // Resumen final
+    const successCount = results.length
+    const errorCount = errors.length
+    
+    if (errorCount > 0) {
+      const errorMessage = `Completado con errores: ${successCount} exitosos, ${errorCount} fallidos`
       setError(errorMessage)
-      toast.error(errorMessage)
+      
+      if (successCount > 0) {
+        toast.success(`${successCount} sitios actualizados correctamente`, { duration: 3000 })
+      }
     } else {
-      toast.success(`Actualizado correctamente en todos los sitios`)
+      toast.success(`🎉 Actualizado correctamente en todos los ${successCount} sitios`)
     }
     
+    console.log(`📊 Resumen: ${successCount} exitosos, ${errorCount} errores`)
     return { results, errors }
   }
 
