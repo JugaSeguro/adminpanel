@@ -167,3 +167,56 @@ Estas variables deben configurarse en los siguientes sitios de Netlify:
 4. Copia:
    - **URL**: Este será tu `VITE_SUPABASE_URL`
    - **anon public**: Esta será tu `VITE_SUPABASE_ANON_KEY`
+
+## Solución al Problema de Enlaces 1-6 No Actualizando
+
+### Problema Identificado
+
+Se detectó que los enlaces 1-6 no estaban actualizando el título ni el link cuando se realizaban cambios desde Supabase, mientras que los enlaces 7-10 sí funcionaban correctamente.
+
+### Causa del Problema
+
+La causa raíz era que los sitios correspondientes a los enlaces 1-6 tenían configuradas variables de entorno de Supabase con valores placeholder en lugar de los valores reales:
+
+- **1xclub-links-casinos** (subdominios 1, 5, 7)
+- **1xclub-links-wsp** (subdominios 2, 6, 8)
+- **24envivo-links-casinos** (subdominios 3, 9)
+- **24envivo-links-wsp** (subdominios 4, 10)
+
+Los archivos `.env` de estos sitios contenían:
+```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Esto impedía que los sitios se conectaran correctamente a Supabase para obtener las actualizaciones.
+
+### Solución Implementada
+
+Se actualizaron los archivos `.env` de todos los sitios (1-6) con los valores reales de Supabase:
+
+```
+VITE_SUPABASE_URL=https://slrzlggigpiinswjfvxr.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNscnpsZ2dpZ3BpaW5zd2pmdnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NTkyOTQsImV4cCI6MjA3MzQzNTI5NH0.sIx1NtdC92TJYOumnDPs-J6zDFz6vjQamOmfxa0AK5c
+```
+
+### Archivos Actualizados
+
+1. `1xclub-links-casinos/.env`
+2. `1xclub-links-wsp/.env`
+3. `24envivo-links-casinos/.env`
+4. `24envivo-links-wsp/.env`
+
+### Resultado Esperado
+
+Con esta corrección, todos los enlaces (1-10) ahora deberían:
+- Conectarse correctamente a Supabase
+- Actualizar el título y link automáticamente cuando se realizan cambios desde el panel de administración
+- Sincronizar los datos en tiempo real
+
+### Nota Importante
+
+Para que los cambios tomen efecto, es necesario:
+1. Reiniciar los servidores de desarrollo si están corriendo
+2. Realizar un nuevo despliegue en Netlify de cada sitio
+3. Verificar que las variables de entorno también estén configuradas en Netlify (como se explica en la sección anterior)
