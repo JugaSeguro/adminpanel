@@ -172,18 +172,61 @@ export const updateWhatsAppLink = async (siteName, newWhatsAppUrl) => {
     const repoInfo = REPOSITORIES[siteName]
     const structureType = repoInfo?.type || 'wsp'
     
-    // Patrón para encontrar links de WhatsApp
-    const whatsappPattern = /https:\/\/wa\.link\/[^"'\s]+/g
+    // Patrones específicos para encontrar SOLO links de WhatsApp en contextos correctos
+    const whatsappPatterns = [
+      // Patrón para onClick con currentConfig.whatsappUrl
+      /(onClick.*window\.open\()(currentConfig\.whatsappUrl)(\))/g,
+      // Patrón para onClick con globalConfig.whatsapp  
+      /(onClick.*window\.open\()(globalConfig\.whatsapp)(\))/g,
+      // Patrón para configuraciones directas
+      /(whatsappUrl:\s*['"])(https:\/\/wa\.link\/[^"']+)(['"])/g,
+      // Patrón para globalConfig.whatsapp en configuraciones
+      /(whatsapp:\s*['"])(https:\/\/wa\.link\/[^"']+)(['"])/g
+    ]
     
-    // DEBUG: Mostrar coincidencias encontradas
-    const matches = content.match(whatsappPattern)
-    console.log(`🎯 Links de WhatsApp encontrados en ${siteName}:`, matches ? matches.length : 0)
-    if (matches) {
-      console.log(`📋 Links actuales:`, matches.slice(0, 3))
+    // Patrón fallback simple
+    const fallbackPattern = /https:\/\/wa\.link\/[^"'\s)]+/g
+    
+    let newContent = content
+    let replacementCount = 0
+    let totalMatches = 0
+    
+    // Intentar cada patrón específico
+    for (let i = 0; i < whatsappPatterns.length; i++) {
+      const pattern = whatsappPatterns[i]
+      const matches = content.match(pattern)
+      
+      if (matches && matches.length > 0) {
+        console.log(`🎯 Patrón ${i + 1} encontró ${matches.length} coincidencias en ${siteName}`)
+        console.log(`📋 Coincidencias:`, matches.slice(0, 2))
+        
+        newContent = newContent.replace(pattern, (match, prefix, middle, suffix) => {
+          replacementCount++
+          // Para patrones que solo tienen el link, reemplazar directamente
+          if (match.includes('https://wa.link/')) {
+            return match.replace(/https:\/\/wa\.link\/[^"'\s)]+/, newWhatsAppUrl)
+          }
+          // Para patrones con variables, mantener la estructura
+          return match
+        })
+        
+        totalMatches += matches.length
+      }
     }
     
-    // Reemplazar TODOS los links de WhatsApp encontrados
-    const newContent = content.replace(whatsappPattern, newWhatsAppUrl)
+    // Si no se encontró nada con patrones específicos, usar fallback
+    if (replacementCount === 0) {
+      console.log(`⚠️ Usando patrón fallback para ${siteName}`)
+      const fallbackMatches = content.match(fallbackPattern)
+      if (fallbackMatches) {
+        console.log(`📋 Links fallback encontrados:`, fallbackMatches.slice(0, 3))
+        newContent = content.replace(fallbackPattern, newWhatsAppUrl)
+        replacementCount = fallbackMatches.length
+        totalMatches = fallbackMatches.length
+      }
+    }
+    
+    console.log(`📊 Total reemplazos realizados en ${siteName}: ${replacementCount}`)
     
     if (!newContent || newContent === content) {
       throw new Error(`No se encontraron links de WhatsApp para actualizar en ${siteName}`)
@@ -198,7 +241,7 @@ export const updateWhatsAppLink = async (siteName, newWhatsAppUrl) => {
       message: `WhatsApp actualizado correctamente en ${siteName}`,
       siteName,
       newWhatsAppUrl,
-      matchesCount: matches ? matches.length : 0
+      matchesCount: replacementCount
     }
     
   } catch (error) {
