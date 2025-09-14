@@ -11,8 +11,8 @@ Los enlaces 7-10 funcionaban correctamente porque tenían la asignación correct
 - Enlaces 9-10: Correctamente asignados a 24envivo-links-casinos y 24envivo-links-wsp
 
 Sin embargo, los enlaces 5-6 estaban incorrectamente asignados:
-- Enlace 5: Incorrectamente asignado a 1xclub-links-casinos (debería ser 24envivo-links-casinos)
-- Enlace 6: Incorrectamente asignado a 1xclub-links-wsp (debería ser 24envivo-links-wsp)
+- Enlace 5: Incorrectamente asignado a 24envivo-links-casinos (debería ser 1xclub-links-casinos)
+- Enlace 6: Incorrectamente asignado a 24envivo-links-wsp (debería ser 1xclub-links-wsp)
 
 ### Solución Implementada
 
@@ -24,8 +24,8 @@ const sites = [
   { name: '1xclub-links-wsp', subdomain: '2.registrogratis.online' },
   { name: '24envivo-links-casinos', subdomain: '3.registrogratis.online' },
   { name: '24envivo-links-wsp', subdomain: '4.registrogratis.online' },
-  { name: '24envivo-links-casinos', subdomain: '5.registrogratis.online' }, // Corregido
-  { name: '24envivo-links-wsp', subdomain: '6.registrogratis.online' }, // Corregido
+  { name: '1xclub-links-casinos', subdomain: '5.registrogratis.online' }, // Corregido: 5 corresponde a 1xclub
+  { name: '1xclub-links-wsp', subdomain: '6.registrogratis.online' }, // Corregido: 6 corresponde a 1xclub
   { name: '1xclub-links-casinos', subdomain: '7.registrogratis.online' },
   { name: '1xclub-links-wsp', subdomain: '8.registrogratis.online' },
   { name: '24envivo-links-casinos', subdomain: '9.registrogratis.online' },
