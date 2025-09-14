@@ -10,6 +10,7 @@ const ConfigTab = React.lazy(() => import('./components/tabs/ConfigTab'))
 const TextsTab = React.lazy(() => import('./components/tabs/TextsTab'))
 const SitesTab = React.lazy(() => import('./components/tabs/SitesTab'))
 const DeployTab = React.lazy(() => import('./components/tabs/DeployTab'))
+const GitHubConfigTab = React.lazy(() => import('./components/tabs/GitHubConfigTab'))
 
 function App() {
   const { activeTab, isLoading } = useAppStore()
@@ -19,7 +20,8 @@ function App() {
       config: ConfigTab,
       texts: TextsTab,
       sites: SitesTab,
-      deploy: DeployTab
+      deploy: DeployTab,
+      github: GitHubConfigTab
     }[activeTab]
 
     return TabComponent ? <TabComponent /> : <ConfigTab />
