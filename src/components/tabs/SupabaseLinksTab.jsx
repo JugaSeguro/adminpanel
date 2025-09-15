@@ -199,20 +199,20 @@ const SupabaseLinksTab = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-green-500/10 rounded-lg">
             <Database className="w-6 h-6 text-green-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-800">Gestión de Enlaces Globales</h2>
-            <p className="text-slate-600 text-sm">Administra enlaces globales usando Supabase</p>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800">Gestión de Enlaces Globales</h2>
+            <p className="text-slate-600 text-xs sm:text-sm">Administra enlaces globales usando Supabase</p>
           </div>
         </div>
         <button
           onClick={handleRefresh}
           disabled={isLoading}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors"
+          className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors w-full sm:w-auto"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           <span>Actualizar</span>
@@ -240,7 +240,7 @@ const SupabaseLinksTab = () => {
         </h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="max-w-md">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Enlace WhatsApp */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -252,13 +252,13 @@ const SupabaseLinksTab = () => {
                 value={formData.whatsapp_link}
                 onChange={(e) => setFormData({ ...formData, whatsapp_link: e.target.value })}
                 placeholder="https://wa.link/iqlqj4"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                 required
               />
             </div>
             
             {/* Título de Registro */}
-            <div className="mt-4">
+            <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 <Type className="inline w-4 h-4 mr-1" />
                 Título de Registro *
@@ -268,24 +268,24 @@ const SupabaseLinksTab = () => {
                 value={formData.register_title}
                 onChange={(e) => setFormData({ ...formData, register_title: e.target.value })}
                 placeholder="Registrate gratis y pedi 2000 fichas para probar"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                 required
               />
             </div>
           </div>
 
-          <div className="flex space-x-3">
+          <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
             <button
               type="submit"
               disabled={isUpdating}
-              className="flex items-center space-x-2 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors"
+              className="flex items-center justify-center space-x-2 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors w-full sm:w-auto"
             >
               {isUpdating ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              <span>{isUpdating ? 'Guardando...' : 'Guardar y Desplegar'}</span>
+              <span className="text-sm">{isUpdating ? 'Guardando...' : 'Guardar y Desplegar'}</span>
             </button>
           </div>
         </form>

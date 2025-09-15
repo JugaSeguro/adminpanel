@@ -28,36 +28,36 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-slate-800 mb-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-2">
               Panel de Administración
             </h1>
-            <p className="text-slate-600">
+            <p className="text-sm sm:text-base text-slate-600 px-4">
               Gestión de enlaces y números de teléfono con Supabase
             </p>
           </div>
 
           {/* Tabs Navigation */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <div className="border-b border-slate-200">
-              <nav className="-mb-px flex space-x-8">
+              <nav className="-mb-px flex flex-col sm:flex-row sm:space-x-8 space-y-2 sm:space-y-0">
                 {tabs.map((tab) => {
                   const Icon = tab.icon
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                      className={`flex items-center justify-center sm:justify-start space-x-2 py-3 sm:py-2 px-4 sm:px-1 border-b-2 sm:border-b-2 font-medium text-sm rounded-t-lg sm:rounded-none ${
                         activeTab === tab.id
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                          ? 'border-blue-500 text-blue-600 bg-blue-50 sm:bg-transparent'
+                          : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 hover:bg-slate-50 sm:hover:bg-transparent'
                       }`}
                     >
                       <Icon className="w-5 h-5" />
-                      <span>{tab.name}</span>
+                      <span className="whitespace-nowrap">{tab.name}</span>
                     </button>
                   )
                 })}

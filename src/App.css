@@ -132,6 +132,98 @@
   .mobile-hidden {
     display: none;
   }
+  
+  /* Mejoras específicas para móviles */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  .mobile-text-center {
+    text-align: center;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-no-gap {
+    gap: 0 !important;
+  }
+  
+  .mobile-padding {
+    padding: 1rem !important;
+  }
+  
+  .mobile-margin {
+    margin: 0.5rem !important;
+  }
+}
+
+/* Tablet responsive utilities */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-hidden {
+    display: none;
+  }
+  
+  .tablet-grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Desktop responsive utilities */
+@media (min-width: 1025px) {
+  .desktop-grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  .desktop-max-width {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+/* Utilidades adicionales para mejor UX responsive */
+.responsive-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mejoras para touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button, .btn-primary, .btn-secondary, .btn-danger {
+    min-height: 44px;
+    padding: 0.75rem 1.5rem;
+  }
+  
+  input, select, textarea {
+    min-height: 44px;
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+}
+
+/* Scroll suave para navegación */
+html {
+  scroll-behavior: smooth;
 }
 
 /* Dark mode support (futuro) */

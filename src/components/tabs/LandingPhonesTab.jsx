@@ -185,10 +185,12 @@ const LandingPhonesTab = () => {
           <select 
             value={selectedGroup} 
             onChange={(e) => setSelectedGroup(e.target.value)}
-            className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             {Object.entries(repositoryGroups).map(([key, group]) => (
-              <option key={key} value={key}>{group.name} ({group.landings.join(', ')})</option>
+              <option key={key} value={key}>
+                {group.name} ({group.landings.join(', ')})
+              </option>
             ))}
           </select>
         </div>
@@ -199,17 +201,17 @@ const LandingPhonesTab = () => {
             <p className="text-sm mb-3">{repositoryGroups[selectedGroup].description}</p>
             <p className="text-sm mb-3">Landings afectadas: {repositoryGroups[selectedGroup].landings.join(', ')}</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-3">
               <input
                 type="url"
                 placeholder="Enlace de WhatsApp (https://wa.me/...)"
-                className="px-3 py-2 border border-slate-300 rounded text-sm bg-white"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 id={`group-whatsapp-${selectedGroup}`}
               />
               <input
                 type="text"
                 placeholder="Descripción (opcional)"
-                className="px-3 py-2 border border-slate-300 rounded text-sm bg-white"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 id={`group-description-${selectedGroup}`}
               />
             </div>
@@ -232,28 +234,28 @@ const LandingPhonesTab = () => {
                 }
               }}
               disabled={isUpdating}
-              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm flex items-center space-x-2"
+              className="mt-3 w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm flex items-center justify-center space-x-2"
             >
               {isUpdating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span>{isUpdating ? 'Actualizando...' : `Actualizar ${repositoryGroups[selectedGroup].name}`}</span>
+              <span className="truncate">{isUpdating ? 'Actualizando...' : `Actualizar ${repositoryGroups[selectedGroup].name}`}</span>
             </button>
         </div>
 
         {/* Resumen de números del grupo */}
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-          <h4 className="font-medium text-slate-800 mb-2">📊 Resumen del Grupo</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="text-slate-600">Total de landings:</span>
-              <span className="ml-2 font-medium text-slate-800">{getFilteredPhones().length}</span>
+          <h4 className="font-medium text-slate-800 mb-3">📊 Resumen del Grupo</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <div className="bg-white p-3 rounded-lg border">
+              <span className="block text-slate-600 text-xs uppercase tracking-wide">Total de landings</span>
+              <span className="text-lg font-bold text-slate-800">{getFilteredPhones().length}</span>
             </div>
-            <div>
-              <span className="text-slate-600">Landings activas:</span>
-              <span className="ml-2 font-medium text-green-600">{getFilteredPhones().filter(p => p.is_active).length}</span>
+            <div className="bg-white p-3 rounded-lg border">
+              <span className="block text-slate-600 text-xs uppercase tracking-wide">Landings activas</span>
+              <span className="text-lg font-bold text-green-600">{getFilteredPhones().filter(p => p.is_active).length}</span>
             </div>
-            <div>
-              <span className="text-slate-600">Landings inactivas:</span>
-              <span className="ml-2 font-medium text-red-600">{getFilteredPhones().filter(p => !p.is_active).length}</span>
+            <div className="bg-white p-3 rounded-lg border">
+              <span className="block text-slate-600 text-xs uppercase tracking-wide">Landings inactivas</span>
+              <span className="text-lg font-bold text-red-600">{getFilteredPhones().filter(p => !p.is_active).length}</span>
             </div>
           </div>
           
@@ -287,46 +289,41 @@ const LandingPhonesTab = () => {
         </div>
       </div>
 
-      {/* Diagnóstico de problemas */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h4 className="font-medium text-yellow-900 mb-2">🔧 Diagnóstico de Problemas</h4>
-        <div className="text-sm text-yellow-800 space-y-2">
-          <p><strong>Si los cambios no se guardan:</strong></p>
-          <ol className="list-decimal list-inside ml-2 space-y-1">
-            <li>Abre la consola del navegador (F12) para ver logs detallados</li>
-            <li>Ve a Supabase Dashboard → SQL Editor</li>
-            <li>Ejecuta: <code className="bg-yellow-100 px-1 rounded">SELECT * FROM pg_policies WHERE tablename = 'landing_phones';</code></li>
-            <li>Si hay políticas RLS, ejecuta: <code className="bg-yellow-100 px-1 rounded">ALTER TABLE public.landing_phones DISABLE ROW LEVEL SECURITY;</code></li>
-          </ol>
-          <p className="mt-2"><strong>Archivo de ayuda:</strong> <code className="bg-yellow-100 px-1 rounded">fix-supabase-rls.sql</code> contiene todos los comandos necesarios.</p>
-        </div>
-      </div>
+
 
       {/* Instrucciones */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="font-medium text-blue-900 mb-2">📋 Instrucciones de Uso por Grupos</h4>
-        <div className="text-sm text-blue-800 space-y-2">
+        <h4 className="font-medium text-blue-900 mb-3">📋 Instrucciones de Uso por Grupos</h4>
+        <div className="text-sm text-blue-800 space-y-3">
           <p><strong>Gestión por Grupo:</strong> Selecciona un grupo para actualizar automáticamente todas sus landings con el mismo enlace de WhatsApp.</p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-            <div>
-              <p><strong>🎰 Grupos Casino:</strong></p>
-              <ul className="list-disc list-inside ml-2 space-y-1">
-                <li><strong>1xclub Casino:</strong> Landings 1, 5, 7 (repo: 1xclub-links-casinos)</li>
-                <li><strong>24envivo Casino:</strong> Landings 3, 9 (repo: 24envivo-links-casinos)</li>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <p className="font-semibold mb-2">🎰 Grupos Casino:</p>
+              <ul className="space-y-2 text-xs">
+                <li><strong>1xclub Casino:</strong> Landings 1, 5, 7<br/><span className="text-blue-600">(repo: 1xclub-links-casinos)</span></li>
+                <li><strong>24envivo Casino:</strong> Landings 3, 9<br/><span className="text-blue-600">(repo: 24envivo-links-casinos)</span></li>
               </ul>
             </div>
             
-            <div>
-              <p><strong>💬 Grupos WhatsApp:</strong></p>
-              <ul className="list-disc list-inside ml-2 space-y-1">
-                <li><strong>1xclub WhatsApp:</strong> Landings 2, 6, 8 (repo: 1xclub-links-wsp)</li>
-                <li><strong>24envivo WhatsApp:</strong> Landings 4, 10 (repo: 24envivo-links-wsp)</li>
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <p className="font-semibold mb-2">💬 Grupos WhatsApp:</p>
+              <ul className="space-y-2 text-xs">
+                <li><strong>1xclub WhatsApp:</strong> Landings 2, 6, 8<br/><span className="text-blue-600">(repo: 1xclub-links-wsp)</span></li>
+                <li><strong>24envivo WhatsApp:</strong> Landings 4, 10<br/><span className="text-blue-600">(repo: 24envivo-links-wsp)</span></li>
               </ul>
             </div>
           </div>
           
-          <p className="mt-3"><strong>Proceso:</strong> 1) Selecciona grupo → 2) Ingresa enlace de WhatsApp → 3) Clic en "Actualizar [Grupo]" → 4) Todas las landings del grupo se actualizan automáticamente</p>
+          <div className="bg-blue-100 p-3 rounded-lg mt-4">
+            <p className="font-semibold mb-2">🔄 Proceso:</p>
+            <ol className="list-decimal list-inside space-y-1 text-xs">
+              <li>Selecciona grupo</li>
+              <li>Ingresa enlace de WhatsApp</li>
+              <li>Clic en "Actualizar [Grupo]"</li>
+              <li>Todas las landings del grupo se actualizan automáticamente</li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>
