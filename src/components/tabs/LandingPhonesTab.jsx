@@ -17,27 +17,39 @@ const LandingPhonesTab = () => {
   const repositoryGroups = {
     '1xclub-casinos': {
       name: '1xclub Casino',
-      landings: [1, 5, 7],
+      landings: [1, 7],
       description: 'Landings de casino para 1xclub',
-      color: 'bg-blue-50 border-blue-200 text-blue-800'
+      color: 'bg-red-100 border-red-300'
     },
     '1xclub-wsp': {
       name: '1xclub WhatsApp',
-      landings: [2, 6, 8],
+      landings: [2, 8],
       description: 'Landings de WhatsApp para 1xclub',
-      color: 'bg-green-50 border-green-200 text-green-800'
+      color: 'bg-green-100 border-green-300'
+    },
+    '1xclub-publicidad-casinos': {
+      name: '1xclub Publicidad Casino',
+      landings: [5],
+      description: 'Landing de publicidad casino para 1xclub',
+      color: 'bg-purple-100 border-purple-300'
+    },
+    '1xclub-publicidad-wsp': {
+      name: '1xclub Publicidad WhatsApp',
+      landings: [6],
+      description: 'Landing de publicidad WhatsApp para 1xclub',
+      color: 'bg-pink-100 border-pink-300'
     },
     '24envivo-casinos': {
       name: '24envivo Casino',
       landings: [3, 9],
       description: 'Landings de casino para 24envivo',
-      color: 'bg-purple-50 border-purple-200 text-purple-800'
+      color: 'bg-blue-100 border-blue-300'
     },
     '24envivo-wsp': {
       name: '24envivo WhatsApp',
       landings: [4, 10],
       description: 'Landings de WhatsApp para 24envivo',
-      color: 'bg-orange-50 border-orange-200 text-orange-800'
+      color: 'bg-yellow-100 border-yellow-300'
     }
   }
 
@@ -79,24 +91,91 @@ const LandingPhonesTab = () => {
       setIsUpdating(true)
       
       console.log(`🔄 Actualizando Landing ${landingNumber} individualmente...`)
+      console.log(`📝 Datos a actualizar:`, {
+        individual_title: title.trim(),
+        individual_whatsapp_link: whatsappLink.trim(),
+        use_individual_settings: useIndividual,
+        landing_number: landingNumber
+      })
       
-      const { data, error } = await supabase
+      // Verificar primero si el registro existe
+      const { data: existingData, error: checkError } = await supabase
         .from('landing_phones')
-        .update({
-          individual_title: title.trim(),
-          individual_whatsapp_link: whatsappLink.trim(),
-          use_individual_settings: useIndividual,
-          updated_at: new Date().toISOString()
-        })
+        .select('*')
         .eq('landing_number', landingNumber)
-        .select()
-        
-      if (error) {
-        console.error(`❌ Error actualizando Landing ${landingNumber}:`, error)
-        throw error
+        .single()
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error(`❌ Error verificando Landing ${landingNumber}:`, checkError)
+        throw new Error(`Error verificando landing: ${checkError.message}`)
       }
       
-      console.log(`✅ Landing ${landingNumber} actualizado individualmente:`, data)
+      if (!existingData) {
+        console.log(`⚠️ Landing ${landingNumber} no existe, creando registro...`)
+        
+        // Crear el registro si no existe
+        const { data: insertData, error: insertError } = await supabase
+          .from('landing_phones')
+          .insert({
+            landing_number: landingNumber,
+            repository_group: getRepositoryGroupForLanding(landingNumber),
+            description: `Landing ${landingNumber}`,
+            whatsapp_link: 'https://wa.me/5491234567890',
+            individual_title: title.trim(),
+            individual_whatsapp_link: whatsappLink.trim(),
+            use_individual_settings: useIndividual,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          
+        if (insertError) {
+          console.error(`❌ Error creando Landing ${landingNumber}:`, insertError)
+          throw new Error(`Error creando landing: ${insertError.message}`)
+        }
+        
+        console.log(`✅ Landing ${landingNumber} creado:`, insertData)
+      } else {
+        console.log(`📋 Landing ${landingNumber} existe, actualizando...`, existingData)
+        
+        // Actualizar el registro existente
+        const { data, error } = await supabase
+          .from('landing_phones')
+          .update({
+            individual_title: title.trim(),
+            individual_whatsapp_link: whatsappLink.trim(),
+            use_individual_settings: useIndividual,
+            updated_at: new Date().toISOString()
+          })
+          .eq('landing_number', landingNumber)
+          .select()
+          
+        if (error) {
+          console.error(`❌ Error actualizando Landing ${landingNumber}:`, error)
+          
+          // Diagnóstico adicional para landings 5-9
+          if ([5, 6, 7, 8, 9].includes(landingNumber)) {
+            console.error(`🔍 Diagnóstico especial para Landing ${landingNumber}:`)
+            console.error(`- Error code: ${error.code}`)
+            console.error(`- Error message: ${error.message}`)
+            console.error(`- Error details:`, error.details)
+            console.error(`- Error hint:`, error.hint)
+            
+            if (error.message.includes('RLS') || error.message.includes('policy')) {
+              throw new Error(`Problema de permisos RLS detectado para Landing ${landingNumber}. Ejecuta el script fix_landings_5_9_update_issue.sql en Supabase.`)
+            }
+          }
+          
+          throw error
+        }
+        
+        if (!data || data.length === 0) {
+          throw new Error(`La actualización no devolvió datos para Landing ${landingNumber}. Posible problema de permisos.`)
+        }
+        
+        console.log(`✅ Landing ${landingNumber} actualizado individualmente:`, data)
+      }
       
       await fetchLandingPhones()
       setEditingIndividual(null)
@@ -106,10 +185,31 @@ const LandingPhonesTab = () => {
       setTimeout(() => setSuccessMessage(''), 3000)
     } catch (err) {
       console.error('Error actualizando landing individual:', err)
-      alert('Error al actualizar landing: ' + err.message)
+      
+      let errorMessage = `Error al actualizar Landing ${landingNumber}: ${err.message}`
+      
+      // Mensajes específicos para landings problemáticos
+      if ([5, 6, 7, 8, 9].includes(landingNumber)) {
+        errorMessage += `\n\n🔧 Soluciones para Landing ${landingNumber}:`
+        errorMessage += '\n1. Ejecuta el script fix_landings_5_9_update_issue.sql en Supabase'
+        errorMessage += '\n2. Verifica que RLS no esté bloqueando las actualizaciones'
+        errorMessage += '\n3. Revisa la consola del navegador para más detalles'
+      }
+      
+      alert(errorMessage)
     } finally {
       setIsUpdating(false)
     }
+  }
+  
+  // Función auxiliar para obtener el grupo de repositorio correcto para un landing
+  const getRepositoryGroupForLanding = (landingNumber) => {
+    for (const [groupKey, group] of Object.entries(repositoryGroups)) {
+      if (group.landings.includes(landingNumber)) {
+        return groupKey
+      }
+    }
+    return '1xclub-casinos' // Fallback por defecto
   }
 
   // Actualizar enlaces de WhatsApp por grupo
@@ -521,7 +621,7 @@ const LandingPhonesTab = () => {
             <div className="bg-blue-100 p-3 rounded-lg">
               <p className="font-semibold mb-2">🎰 Grupos Casino:</p>
               <ul className="space-y-2 text-xs">
-                <li><strong>1xclub Casino:</strong> Landings 1, 5, 7<br/><span className="text-blue-600">(repo: 1xclub-links-casinos)</span></li>
+                <li><strong>1xclub Casino:</strong> Landings 1, 7<br/><span className="text-blue-600">(repo: 1xclub-links-casinos)</span></li>
                 <li><strong>24envivo Casino:</strong> Landings 3, 9<br/><span className="text-blue-600">(repo: 24envivo-links-casinos)</span></li>
               </ul>
             </div>
@@ -529,8 +629,24 @@ const LandingPhonesTab = () => {
             <div className="bg-blue-100 p-3 rounded-lg">
               <p className="font-semibold mb-2">💬 Grupos WhatsApp:</p>
               <ul className="space-y-2 text-xs">
-                <li><strong>1xclub WhatsApp:</strong> Landings 2, 6, 8<br/><span className="text-blue-600">(repo: 1xclub-links-wsp)</span></li>
+                <li><strong>1xclub WhatsApp:</strong> Landings 2, 8<br/><span className="text-blue-600">(repo: 1xclub-links-wsp)</span></li>
                 <li><strong>24envivo WhatsApp:</strong> Landings 4, 10<br/><span className="text-blue-600">(repo: 24envivo-links-wsp)</span></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <p className="font-semibold mb-2">📢 Grupos Publicidad Casino:</p>
+              <ul className="space-y-2 text-xs">
+                <li><strong>1xclub Publicidad Casino:</strong> Landing 5<br/><span className="text-purple-600">(repo: 1xclub-publicidad-casinos)</span></li>
+              </ul>
+            </div>
+            
+            <div className="bg-pink-100 p-3 rounded-lg">
+              <p className="font-semibold mb-2">📢 Grupos Publicidad WhatsApp:</p>
+              <ul className="space-y-2 text-xs">
+                <li><strong>1xclub Publicidad WhatsApp:</strong> Landing 6<br/><span className="text-pink-600">(repo: 1xclub-publicidad-wsp)</span></li>
               </ul>
             </div>
           </div>
