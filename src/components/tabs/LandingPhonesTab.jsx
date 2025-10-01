@@ -86,7 +86,7 @@ const LandingPhonesTab = () => {
   }
 
   // Actualizar configuración individual de una landing
-  const updateIndividualLanding = async (landingNumber, title, whatsappLink, useIndividual) => {
+  const updateIndividualLanding = async (landingNumber, title, whatsappLink, telegramLink, useIndividual, useIndividualTelegram) => {
     try {
       setIsUpdating(true)
       
@@ -94,7 +94,9 @@ const LandingPhonesTab = () => {
       console.log(`📝 Datos a actualizar:`, {
         individual_title: title.trim(),
         individual_whatsapp_link: whatsappLink.trim(),
+        individual_telegram_link: telegramLink.trim(),
         use_individual_settings: useIndividual,
+        use_individual_telegram: useIndividualTelegram,
         landing_number: landingNumber
       })
       
@@ -121,9 +123,12 @@ const LandingPhonesTab = () => {
             repository_group: getRepositoryGroupForLanding(landingNumber),
             description: `Landing ${landingNumber}`,
             whatsapp_link: 'https://wa.me/5491234567890',
+            telegram_link: 'https://t.me/jugadirecto',
             individual_title: title.trim(),
             individual_whatsapp_link: whatsappLink.trim(),
+            individual_telegram_link: telegramLink.trim(),
             use_individual_settings: useIndividual,
+            use_individual_telegram: useIndividualTelegram,
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -145,7 +150,9 @@ const LandingPhonesTab = () => {
           .update({
             individual_title: title.trim(),
             individual_whatsapp_link: whatsappLink.trim(),
+            individual_telegram_link: telegramLink.trim(),
             use_individual_settings: useIndividual,
+            use_individual_telegram: useIndividualTelegram,
             updated_at: new Date().toISOString()
           })
           .eq('landing_number', landingNumber)
@@ -212,8 +219,8 @@ const LandingPhonesTab = () => {
     return '1xclub-casinos' // Fallback por defecto
   }
 
-  // Actualizar enlaces de WhatsApp por grupo
-  const updateGroupPhones = async (groupKey, whatsappLink, description = '') => {
+  // Actualizar enlaces de WhatsApp y Telegram por grupo
+  const updateGroupPhones = async (groupKey, whatsappLink, telegramLink, description = '') => {
     try {
       setIsUpdating(true)
       const group = repositoryGroups[groupKey]
@@ -223,7 +230,14 @@ const LandingPhonesTab = () => {
         return
       }
       
-      console.log(`🔄 Actualizando grupo ${group.name} con enlace: ${whatsappLink.trim()}`)
+      if (!telegramLink || telegramLink.trim() === '') {
+        alert('El enlace de Telegram es requerido')
+        return
+      }
+      
+      console.log(`🔄 Actualizando grupo ${group.name} con enlaces:`)
+      console.log(`📱 WhatsApp: ${whatsappLink.trim()}`)
+      console.log(`📱 Telegram: ${telegramLink.trim()}`)
       
       const updates = group.landings.map(async (landingNumber) => {
         const autoDescription = description || `${group.name} - Landing ${landingNumber}`
@@ -234,6 +248,7 @@ const LandingPhonesTab = () => {
           .from('landing_phones')
           .update({
             whatsapp_link: whatsappLink.trim(),
+            telegram_link: telegramLink.trim(),
             description: autoDescription,
             updated_at: new Date().toISOString()
           })
@@ -356,10 +371,10 @@ const LandingPhonesTab = () => {
           <div>
             <h3 className="text-lg font-semibold text-slate-800 mb-2 flex items-center space-x-2">
               <Phone className="w-5 h-5" />
-              <span>Gestión de Enlaces WhatsApp por Grupo de Repositorio</span>
+              <span>Gestión de Enlaces WhatsApp y Telegram por Grupo de Repositorio</span>
             </h3>
             <p className="text-slate-600 text-sm mb-4">
-              Configura enlaces de WhatsApp por grupo de repositorio. Cada grupo afecta automáticamente a sus landings correspondientes.
+              Configura enlaces de WhatsApp y Telegram por grupo de repositorio. Cada grupo afecta automáticamente a sus landings correspondientes.
             </p>
 
             <div className="mb-6">
@@ -390,6 +405,12 @@ const LandingPhonesTab = () => {
                   id={`group-whatsapp-${selectedGroup}`}
                 />
                 <input
+                  type="url"
+                  placeholder="Enlace de Telegram (https://t.me/...)"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  id={`group-telegram-${selectedGroup}`}
+                />
+                <input
                   type="text"
                   placeholder="Descripción (opcional)"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -400,18 +421,21 @@ const LandingPhonesTab = () => {
               <button
                 onClick={() => {
                   const whatsappInput = document.getElementById(`group-whatsapp-${selectedGroup}`)
+                  const telegramInput = document.getElementById(`group-telegram-${selectedGroup}`)
                   const descriptionInput = document.getElementById(`group-description-${selectedGroup}`)
                   
-                  if (whatsappInput.value.trim()) {
+                  if (whatsappInput.value.trim() && telegramInput.value.trim()) {
                     updateGroupPhones(
                       selectedGroup, 
                       whatsappInput.value.trim(),
+                      telegramInput.value.trim(),
                       descriptionInput.value.trim()
                     )
                     whatsappInput.value = ''
+                    telegramInput.value = ''
                     descriptionInput.value = ''
                   } else {
-                    alert('Por favor ingresa un enlace de WhatsApp')
+                    alert('Por favor ingresa enlaces de WhatsApp y Telegram')
                   }
                 }}
                 disabled={isUpdating}
@@ -497,7 +521,9 @@ const LandingPhonesTab = () => {
                           setIndividualData({
                             title: landing.individual_title || `Casino Landing ${landing.landing_number}`,
                             whatsappLink: landing.individual_whatsapp_link || '',
-                            useIndividual: landing.use_individual_settings || false
+                            telegramLink: landing.individual_telegram_link || '',
+                            useIndividual: landing.use_individual_settings || false,
+                            useIndividualTelegram: landing.use_individual_telegram || false
                           })
                         }}
                         className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded"
@@ -529,30 +555,56 @@ const LandingPhonesTab = () => {
                           placeholder="https://wa.me/..."
                         />
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">Telegram:</label>
                         <input
-                          type="checkbox"
-                          id={`use-individual-${landing.landing_number}`}
-                          checked={individualData.useIndividual || false}
-                          onChange={(e) => setIndividualData({...individualData, useIndividual: e.target.checked})}
-                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          type="url"
+                          value={individualData.telegramLink || ''}
+                          onChange={(e) => setIndividualData({...individualData, telegramLink: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="https://t.me/..."
                         />
-                        <label htmlFor={`use-individual-${landing.landing_number}`} className="text-xs text-slate-700">
-                          Usar configuración individual
-                        </label>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`use-individual-${landing.landing_number}`}
+                            checked={individualData.useIndividual || false}
+                            onChange={(e) => setIndividualData({...individualData, useIndividual: e.target.checked})}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <label htmlFor={`use-individual-${landing.landing_number}`} className="text-xs text-slate-700">
+                            Usar configuración individual WhatsApp
+                          </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`use-individual-telegram-${landing.landing_number}`}
+                            checked={individualData.useIndividualTelegram || false}
+                            onChange={(e) => setIndividualData({...individualData, useIndividualTelegram: e.target.checked})}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <label htmlFor={`use-individual-telegram-${landing.landing_number}`} className="text-xs text-slate-700">
+                            Usar configuración individual Telegram
+                          </label>
+                        </div>
                       </div>
                       <div className="flex space-x-2">
                         <button
                           onClick={() => {
-                            if (individualData.title && individualData.whatsappLink) {
+                            if (individualData.title && individualData.whatsappLink && individualData.telegramLink) {
                               updateIndividualLanding(
                                 landing.landing_number,
                                 individualData.title,
                                 individualData.whatsappLink,
-                                individualData.useIndividual
+                                individualData.telegramLink,
+                                individualData.useIndividual,
+                                individualData.useIndividualTelegram
                               )
                             } else {
-                              alert('Por favor completa título y enlace de WhatsApp')
+                              alert('Por favor completa título, enlace de WhatsApp y enlace de Telegram')
                             }
                           }}
                           disabled={isUpdating}
@@ -588,6 +640,14 @@ const LandingPhonesTab = () => {
                           {landing.use_individual_settings && landing.individual_whatsapp_link
                             ? landing.individual_whatsapp_link
                             : landing.whatsapp_link || 'No configurado'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-slate-600">Telegram:</span>
+                        <p className="text-sm text-slate-800 truncate">
+                          {landing.use_individual_telegram && landing.individual_telegram_link
+                            ? landing.individual_telegram_link
+                            : landing.telegram_link || 'No configurado'}
                         </p>
                       </div>
                       <div>
